@@ -167,7 +167,8 @@
 *  Call #hal_pinmux_set_function() to pinmux GPIO pins to four SPI pins (CS_N, SCK, MOSI, and MISO) based on the user's hardware platform design.
 *  Once a transaction is complete, call #hal_spi_master_deinit() function to release the SPI master resource to make it
 *  available for other users. The steps are shown below:
-*  - Step1: Call #hal_pinmux_set_function() to set GPIO pinmux. For more details about #hal_pinmux_set_function(), please refer to @ref GPIO.
+*  - Step1: Call #hal_pinmux_set_function() to set GPIO pinmux, if EPT tool didn't been used to configure the related pinmux.
+*           For more details about #hal_pinmux_set_function(), please refer to @ref GPIO.
 *  - Step2: Call #hal_spi_master_init() to initialize one SPI master. If the SPI master is already initialized by another user, user will get #HAL_SPI_MASTER_STATUS_ERROR_BUSY.
 *  - Step3: Call #hal_spi_master_set_macro_selection() to configure SPI pad macro. If the GPIO selected in Step 1
 *           doesn't belong to SPI pad macro group A.
@@ -182,8 +183,8 @@
 *  - Step9: Call #hal_spi_master_deinit() to deinitialize the SPI master, if it's no longer in use.
 *  - sample code:
 *    @code
-*       hal_pinmux_set_function(gpio_pin, function_index);//set pinmux
-*       ret = hal_spi_master_init(master_port,&spi_config); // init SPI master.
+*       hal_pinmux_set_function(gpio_pin, function_index); //need not to configure pinmux if EPT tool is used.
+*       ret = hal_spi_master_init(master_port,&spi_config); //init SPI master.
 *       if (HAL_SPI_MASTER_STATUS_OK == ret) {
 *           //hal_spi_master_set_macro_selection(master_port,macro_select); //configure SPI pad macro if needed
 *           //hal_spi_master_set_chip_select_timing(master_port,chip_select_timing); //configure chip select signal timing if needed
@@ -208,7 +209,8 @@
 *  Then call #hal_spi_master_register_callback() to register a callback function. Once a transaction is complete, call
 *  #hal_spi_master_deinit() function \b in \b your \b callback \b function to release the SPI master resource to make it available for other users.
 *  The steps are shown below:
-*  - Step1: Call #hal_pinmux_set_function() to set GPIO pinmux. For more details about #hal_pinmux_set_function(), please refer to @ref GPIO.
+*  - Step1: Call #hal_pinmux_set_function() to set GPIO pinmux, if EPT tool didn't been used to configure the related pinmux.
+*           For more details about #hal_pinmux_set_function(), please refer to @ref GPIO.
 *  - Step2: Call #hal_spi_master_init() to init one SPI master. If the SPI master is already initialized by another user, user will get #HAL_SPI_MASTER_STATUS_ERROR_BUSY.
 *  - Step3: Call #hal_spi_master_register_callback() to register a user callback.
 *  - Step4: Call #hal_spi_master_set_macro_selection() to configure SPI pad macro. If the GPIO selected in Step 1
@@ -224,7 +226,7 @@
 *  - Step10: Call #hal_spi_master_deinit() to deinit the SPI master, if it's no longer in use.
 *  - sample code:
 *    @code
-*       hal_pinmux_set_function(gpio_pin, function_index);//set pinmux
+*       hal_pinmux_set_function(gpio_pin, function_index); //need not to configure pinmux if EPT tool is used.
 *       ret = hal_spi_master_init(master_port,&spi_config); // init SPI master.
 *       if (HAL_SPI_MASTER_STATUS_OK == ret) {
 *           hal_spi_master_register_callback(master_port,user_spi_callback,NULL)// register a user callback.
@@ -272,7 +274,8 @@
 *  Call #hal_pinmux_set_function() to pinmux GPIO pins to four SPI pins (CS_N, SCK, MOSI, and MISO) based on the user's hardware platform design.
 *  Once a transaction is complete, call #hal_spi_master_deinit() function to release the SPI master resource to make it
 *  available for other users. The steps are shown below:
-*  - Step1: Call #hal_pinmux_set_function() to set GPIO pinmux. For more details about #hal_pinmux_set_function(), please refer to @ref GPIO. Note, user
+*  - Step1: Call #hal_pinmux_set_function() to set GPIO pinmux, if EPT tool didn't been used to configure the related pinmux.
+*           For more details about #hal_pinmux_set_function(), please refer to @ref GPIO. Note, user
 *           should configure the chip select pin as GPIO mode, this driver will set the chip select signal as valid before starting the transaction,
 *           then set the chip select signal as invalid after finishing the transaction.
 *  - Step2: Call #hal_spi_master_init() to initialize one SPI master.
@@ -281,7 +284,7 @@
 *  - Step5: Call #hal_spi_master_deinit() to deinitialize the SPI master, if it's no longer in use.
 *  - sample code:
 *    @code
-*       hal_pinmux_set_function(gpio_pin, function_index);//set pinmux, chip select pin should be configured as GPIO mode
+*       hal_pinmux_set_function(gpio_pin, function_index);//chip select pin should be configured as GPIO mode. Need not to configure pinmux if EPT tool is used.
 *       ret = hal_spi_master_init(master_port,&spi_config); // init SPI master.
 *       if (HAL_SPI_MASTER_STATUS_OK == ret) {
 *           ret = hal_spi_master_send_polling(master_port,data,size); //send data
@@ -430,7 +433,7 @@ typedef enum {
 
 /** @brief SPI master configure structure */
 typedef struct {
-    uint32_t clock_frequency;                                /**< SPI master clock frequency setting, range from 30000Hz to 6000000Hz. */
+    uint32_t clock_frequency;                                /**< SPI master clock frequency setting, range from 30000Hz to 13000000Hz. */
     hal_spi_master_slave_port_t slave_port;                  /**< SPI slave device selection. */
     hal_spi_master_bit_order_t bit_order;                    /**< SPI master bit order setting. */
     hal_spi_master_clock_polarity_t polarity;                /**< SPI master clock polarity setting. */
@@ -443,7 +446,7 @@ typedef struct {
 typedef struct {
     hal_spi_master_byte_order_t byte_order;                     /**< SPI master byte order setting. */
     hal_spi_master_chip_select_polarity_t chip_polarity;        /**< SPI master chip select active polarity setting. */
-    hal_spi_master_get_tick_mode_t get_tick;                    /**< SPI clock timing tolerance setting. */
+    hal_spi_master_get_tick_mode_t get_tick;                    /**< SPI clock timing tolerance setting. User may need to change this setting when high frequency is used. */
     hal_spi_master_sample_select_t sample_select;               /**< SPI MISO sample edge setting. */
 } hal_spi_master_advanced_config_t;
 #endif
@@ -605,7 +608,7 @@ hal_spi_master_status_t hal_spi_master_send_polling(hal_spi_master_port_t master
  *            user should call #hal_spi_master_register_callback() firstly to register callback, once the transaction finished, the callback
  *            will be called in SPI interrupt service routine.
  * @param[in] master_port is the SPI master port number, the value is defined in #hal_spi_master_port_t.
- * @param[in] data is the buffer of data to be sent, this parameter cannot be NULL.
+ * @param[in] data is the buffer of data to be sent, this parameter cannot be NULL, also the address must be as non-cacheable address.
  * @param[in] size is the number of bytes to send. Note that if size is larger than 1kB, the size should be multiple of 1kB, otherwise,
  *            user should separate this into two transactions, one has the size of multiple of 1kB, another has the size less than 1kB.
  * @return    #HAL_SPI_MASTER_STATUS_ERROR_PORT means master_port parameter is an invalid port number; \n
@@ -660,7 +663,7 @@ hal_spi_master_status_t hal_spi_master_send_and_receive_polling(hal_spi_master_p
  *            get from SPI device's datasheet. For example, if user use <a href="http://www.analog.com/media/en/technical-documentation/data-sheets/ADIS16375.pdf"> ADIS16375 </a>
  *            as full duplex communication mode, the data received while sending command is valid. If user use
  *            <a href="http://www.thaieasyelec.com/downloads/EFDV423/PAH8001EI-2G.pdf"> PAH8001EI-2G </a> sensor, the data received while
- *            sending command is invalid.
+ *            sending command is invalid. The address parameters cannot be NULL, also must be as non-cacheable address.
  * @return    #HAL_SPI_MASTER_STATUS_ERROR_PORT means master_port parameter is an invalid port number; \n
  *            #HAL_SPI_MASTER_STATUS_ERROR_BUSY means this port of SPI master is busy and not available for use; \n
  *            #HAL_SPI_MASTER_STATUS_INVALID_PARAMETER means an invalid parameter in spi_send_and_receive_config is given; \n

@@ -231,8 +231,8 @@
  *   The #hal_i2s_init() function configures the I2S type to be set at the beginning of an I2S operation.\n
  *   The #hal_i2s_deinit() function resets the I2S type configuration. \n
  *   The #hal_i2s_set_config() function configures the I2S settings providing the respective sampling rate, downsampling rate in RX mode, data swapping between right and left channels, word select(WS) inverting, mono duplication in TX mode, bits delay from frame sync and channel number for TX and RX links as well as the clock mode for the whole I2S. The user should configure settings before enabling the I2S functions. \n 
- *   The #hal_i2s_setup_tx_vfifo() function configures DMA TX VFIFO. \n 
- *   The #hal_i2s_setup_rx_vfifo() function configures DMA RX VFIFO. \n 
+ *   The #hal_i2s_setup_tx_vfifo() function configures DMA TX VFIFO. \n
+ *   The #hal_i2s_setup_rx_vfifo() function configures DMA RX VFIFO. \n
  *   The functions are: \n
  *   - #hal_i2s_init()
  *   - #hal_i2s_deinit()
@@ -477,7 +477,8 @@
  * - \b Initialization \b and \b configuration \b functions \n
  *   The #hal_i2s_init() function configures the I2S type to be set at the beginning of an I2S operation.
  *   The #hal_i2s_deinit() function resets the I2S type configuration. \n
- *   The #hal_i2s_set_config() function configures the I2S settings providing the respective sample rate and channel number for TX and RX links as well as the clock mode for the whole I2S. The user should configure at least the clock mode and either one of the link settings before enabling the I2S functions. The functions are:
+ *   The #hal_i2s_set_config() function configures the I2S settings providing the respective sample rate and channel number for TX and RX links as well as the clock mode for the whole I2S. The channel number should be set to #HAL_I2S_STEREO, and the sample rate of TX and RX links should be configured to the same one before enabling the I2S functions.
+ *   The functions are:
  *   - #hal_i2s_init()
  *   - #hal_i2s_deinit()
  *   - #hal_i2s_set_config()
@@ -516,11 +517,11 @@
  *    - #hal_i2s_get_tx_sample_count()
  *    - sample code:
  *    @code
- *     uint16_t user_buffer[512] = { // with data };
+ *     uint8_t user_buffer[1024] = { // with data };
  *     static void i2s_write_data(void)
  *     {
  *         uint32_t sample_count = 0;
- *         uint16_t *data_buffer = (uint16_t *)user_buffer;
+ *         uint8_t *data_buffer = (uint8_t *)user_buffer;
  *         //  get available free space of TX buffer
  *         hal_i2s_get_tx_sample_count(&sample_count);
  *         // write numbers of sample_count samples for audio out
@@ -533,11 +534,11 @@
  *    - #hal_i2s_get_rx_sample_count()
  *    - sample code:
  *    @code
- *     uint16_t user_buffer[512];
+ *     uint8_t user_buffer[1024];
  *     static void i2s_read_data(void)
  *     {
  *         uint32_t sample_count = 0;
- *         uint16_t *data_buffer = (uint16_t *)user_buffer;
+ *         uint8_t *data_buffer = (uint8_t *)user_buffer;
  *         // get available data count of RX buffer
  *         hal_i2s_get_rx_sample_count(&sample_count);
  *         // copy numbers of sample_count samples into user_buffer
@@ -719,7 +720,7 @@ hal_i2s_status_t hal_i2s_deinit(void);
  *            #HAL_I2S_STATUS_OK, if the operation is successful.
  * @note      To avoid unpredictable system operation, calling #hal_i2s_set_config() during the I2S execution is not allowed. User should disable the TX/RX links before setting the configuration. \n
  *            Enable the right channel of the I2S TX to send the same data as on the left channel of the I2S TX is not allowed when the channel number of I2S TX is set to HAL_I2S_STEREO. \n
- *            The sampling rate of TX and RX are set to a different value is not allowed. 
+ *            The sampling rate of TX and RX are set to a different value is not allowed.
  * @sa        #hal_i2s_get_config()
  */
 hal_i2s_status_t hal_i2s_set_config(const hal_i2s_config_t *config);
@@ -751,7 +752,8 @@ hal_i2s_status_t hal_i2s_deinit(void);
  * @return    #HAL_I2S_STATUS_INVALID_PARAMETER, if wrong parameter is given. User should check the parameter when receiving this value. \n
  *            #HAL_I2S_STATUS_ERROR, if one of I2S links is still available. Call #hal_i2s_disable_tx() and #hal_i2s_disable_rx() to disable the TX/RX links before calling this function. \n
  *            #HAL_I2S_STATUS_OK, if the operation is successful.
- * @note      To avoid unpredictable system operation, calling #hal_i2s_set_config() during the I2S execution is not allowed. User should disable the TX/RX links before setting the configuration.
+ * @note      To avoid unpredictable system operation, calling #hal_i2s_set_config() during the I2S execution is not allowed. User should disable the TX/RX links before setting the configuration. \n
+              The sampling rate of TX and RX are set to a different value is not allowed.
  * @sa        #hal_i2s_get_config()
  */
 hal_i2s_status_t hal_i2s_set_config(const hal_i2s_config_t *config);
@@ -771,7 +773,8 @@ hal_i2s_status_t hal_i2s_get_config(hal_i2s_config_t *config);
 #ifdef HAL_I2S_EXTENDED
 /**
  * @brief     This function enables uplink and downlink FIFOs of the I2S link.
- * @return    #HAL_I2S_STATUS_OK, if the operation is successful. The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
+ * @return    #HAL_I2S_STATUS_OK, if the operation is successful. \n
+              The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
  * @sa        #hal_i2s_disable_audio_top()
  * @note      Call this function before #hal_i2s_enable_tx() and #hal_i2s_enable_rx().
  */
@@ -779,8 +782,9 @@ hal_i2s_status_t  hal_i2s_enable_audio_top(void);
 
 
 /**
- * @brief      This function disables uplink and downlink FIFOs of the I2S link.
- * @return   #HAL_I2S_STATUS_OK, if the operation is successful. The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
+ * @brief     This function disables uplink and downlink FIFOs of the I2S link.
+ * @return    #HAL_I2S_STATUS_OK, if the operation is successful. \n
+              The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
  * @sa        #hal_i2s_enable_audio_top()
  * @note      Call this function after #hal_i2s_disable_tx() and #hal_i2s_disable_rx().
  */
@@ -790,7 +794,7 @@ hal_i2s_status_t  hal_i2s_disable_audio_top(void);
 
 /**
  * @brief      This function queries the size of the required memory to be allocated for an internal use in the I2S driver.
- * @param[out] memory_size is the amount of memory required for the I2S driver for an internal use (in bytes).
+ * @param[out] memory_size is the amount of memory required for the I2S driver for an internal use. (in bytes)
  * @return     #HAL_I2S_STATUS_INVALID_PARAMETER, if input parameter is invalid. \n
                #HAL_I2S_STATUS_OK, if the operation is successful.
  * @note       Call this function at least before #hal_i2s_enable_tx() or #hal_i2s_enable_rx() to ensure there is enough memory for an internal use.
@@ -833,7 +837,8 @@ hal_i2s_status_t  hal_i2s_enable_tx_dma_interrupt(void);
 
 /**
  * @brief     This function disables the TX VFIFO DMA interrupt.
- * @return   #HAL_I2S_STATUS_OK, if the operation is successful. The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
+ * @return    #HAL_I2S_STATUS_OK, if the operation is successful. \n
+              The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
  * @sa        #hal_i2s_enable_tx_dma_interrupt()
  */
 hal_i2s_status_t  hal_i2s_disable_tx_dma_interrupt(void);
@@ -851,7 +856,8 @@ hal_i2s_status_t  hal_i2s_enable_rx_dma_interrupt(void);
 
 /**
  * @brief     This function disables the RX VFIFO DMA interrupt.
- * @return   #HAL_I2S_STATUS_OK, if the operation is successful. The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
+ * @return    #HAL_I2S_STATUS_OK, if the operation is successful. \n
+              The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
  * @sa        #hal_i2s_enable_rx_dma_interrupt()
  */
 hal_i2s_status_t  hal_i2s_disable_rx_dma_interrupt(void);
@@ -863,7 +869,7 @@ hal_i2s_status_t  hal_i2s_disable_rx_dma_interrupt(void);
  *            VFIFO DMA will trigger an interrupt when the amount of output data in TX VFIFO is lower than the TX VFIFO threshold.
  * @param[in] buffer is the pointer to memory buffer for the TX VFIFO.
  * @param[in] threshold is the value of the TX VFIFO threshold.
- * @param[in] buffer_length is the length to memory buffer for the TX VFIFO. 
+ * @param[in] buffer_length is the length to memory buffer for the TX VFIFO.
  * @return   #HAL_I2S_STATUS_ERROR, if one of I2S links is still available. Call #hal_i2s_disable_tx(), #hal_i2s_disable_rx() and #hal_i2s_disable_audio_top() to disable the TX/RX links before calling this function. \n  
  *              #HAL_I2S_STATUS_INVALID_PARAMETER, if the buffer is a NULL pointer. \n
  *              #HAL_I2S_STATUS_OK, if the operation is successful.
@@ -877,7 +883,8 @@ hal_i2s_status_t hal_i2s_setup_tx_vfifo(uint32_t *buffer, uint32_t threshold, ui
 /**
  * @brief     This function stops the transmit operation.
  *            The FIFO will stop to pump data from the TX VFIFO buffer into I2S TX.
- * @return   #HAL_I2S_STATUS_OK, if the operation is successful. The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
+ * @return    #HAL_I2S_STATUS_OK, if the operation is successful.  \n
+              The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
  * @sa        #hal_i2s_setup_tx_vfifo()
  */
 hal_i2s_status_t hal_i2s_stop_tx_vfifo(void);
@@ -914,7 +921,8 @@ hal_i2s_status_t hal_i2s_setup_rx_vfifo(uint32_t *buffer, uint32_t threshold, ui
 /**
  * @brief     This function stops the receive operation.
  *            The FIFO will stop to pump data from the I2S RX into the RX VFIFO buffer.
- * @return   #HAL_I2S_STATUS_OK, if the operation is successful. The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
+ * @return    #HAL_I2S_STATUS_OK, if the operation is successful. \n
+              The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
  * @sa        #hal_i2s_setup_rx_vfifo()
  */
 hal_i2s_status_t hal_i2s_stop_rx_vfifo(void);
@@ -958,7 +966,8 @@ hal_i2s_status_t hal_i2s_register_rx_callback(hal_i2s_rx_callback_t rx_callback,
 #ifdef HAL_I2S_EXTENDED
 /**
 * @brief     This function enables the I2S output link.
-* @return   #HAL_I2S_STATUS_OK, if the operation is successful. The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
+* @return    #HAL_I2S_STATUS_OK, if the operation is successful.  \n
+             The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
 * @note      Call this function after #hal_i2s_enable_audio_top().
 * @sa        #hal_i2s_disable_tx()
 */
@@ -967,7 +976,8 @@ hal_i2s_status_t  hal_i2s_enable_tx(void);
 
 /**
  * @brief     This function disables the I2S output link.
- * @return  #HAL_I2S_STATUS_OK, if the operation is successful. The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
+ * @return    #HAL_I2S_STATUS_OK, if the operation is successful.  \n
+              The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
  * @note      Call this function before #hal_i2s_disable_audio_top().
  * @sa        #hal_i2s_enable_tx()
  */
@@ -984,7 +994,8 @@ hal_i2s_status_t  hal_i2s_enable_tx(void);
 
 /**
  * @brief     This function disables the I2S output link.
- * @return    #HAL_I2S_STATUS_OK, if the operation is successful. The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
+ * @return    #HAL_I2S_STATUS_OK, if the operation is successful. \n
+              The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
  * @sa        #hal_i2s_enable_tx()
  */
 hal_i2s_status_t  hal_i2s_disable_tx(void);
@@ -995,8 +1006,9 @@ hal_i2s_status_t  hal_i2s_disable_tx(void);
 /**
  * @brief     This function transmits data to the I2S output link.
  * @param[in] data is the output data to send.
- * @return    #HAL_I2S_STATUS_OK, if the operation is successful. The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
- * @note       Call this function after #hal_i2s_get_tx_sample_count() function to ensure there is enough free space in the TX VFIFO buffer for the write operation.
+ * @return    #HAL_I2S_STATUS_OK, if the operation is successful. \n
+              The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
+ * @note      Call this function after #hal_i2s_get_tx_sample_count() function to ensure there is enough free space in the TX VFIFO buffer for the write operation.
  * @sa        #hal_i2s_get_tx_sample_count()
  */
 hal_i2s_status_t hal_i2s_tx_write(uint32_t data);
@@ -1015,7 +1027,7 @@ hal_i2s_status_t hal_i2s_get_tx_sample_count(uint32_t *sample_count);
 /**
  * @brief     This function transmits data to the I2S output link.
  * @param[in] buffer is a pointer to the output data.
- * @param[in] sample_count is the available free space in the output buffer.
+ * @param[in] sample_count is the available free space in the output buffer. (in bytes)
  * @return    #HAL_I2S_STATUS_INVALID_PARAMETER, if input parameter sample_count is zero or greater than the size of the free space in the TX buffer. 
               For more details about the parameter sample_count, please refer to #hal_i2s_get_tx_sample_count(). \n
               #HAL_I2S_STATUS_ERROR, if an error occurred during data transmission. \n
@@ -1027,10 +1039,10 @@ hal_i2s_status_t hal_i2s_tx_write(const void *buffer, uint32_t sample_count);
 
 /**
  * @brief      This function queries the available free space for an output.
- * @param[out] sample_count is the number of free samples available for an output.
- * @return    #HAL_I2S_STATUS_INVALID_PARAMETER, if a NULL pointer is given by user. \n
- *              #HAL_I2S_STATUS_OK, if the operation is successful.
- * @note      Call thin function before #hal_i2s_tx_write() function to ensure there is enough free space in the TX buffer for the write operation.
+ * @param[out] sample_count is the number of free samples available for an output. (in bytes)
+ * @return     #HAL_I2S_STATUS_INVALID_PARAMETER, if a NULL pointer is given by user. \n
+ *             #HAL_I2S_STATUS_OK, if the operation is successful.
+ * @note       Call thin function before #hal_i2s_tx_write() function to ensure there is enough free space in the TX buffer for the write operation.
  * @sa         #hal_i2s_tx_write()
  */
 hal_i2s_status_t hal_i2s_get_tx_sample_count(uint32_t *sample_count);
@@ -1040,7 +1052,8 @@ hal_i2s_status_t hal_i2s_get_tx_sample_count(uint32_t *sample_count);
 #ifdef HAL_I2S_EXTENDED
 /**
  * @brief     This function enables the I2S input link.
- * @return   #HAL_I2S_STATUS_OK, if the operation is successful. The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
+ * @return    #HAL_I2S_STATUS_OK, if the operation is successful. \n
+              The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
  * @note      Call this function after #hal_i2s_enable_audio_top().
  * @sa        #hal_i2s_disable_rx()
  */
@@ -1049,7 +1062,8 @@ hal_i2s_status_t hal_i2s_get_tx_sample_count(uint32_t *sample_count);
 
 /**
  * @brief     This function disables the I2S input link.
- * @return  #HAL_I2S_STATUS_OK, if the operation is successful. The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
+ * @return    #HAL_I2S_STATUS_OK, if the operation is successful. \n
+              The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
  * @note      Call this function before #hal_i2s_disable_audio_top().
  * @sa        #hal_i2s_enable_rx()
  */
@@ -1067,7 +1081,8 @@ hal_i2s_status_t hal_i2s_disable_rx(void);
 
 /**
  * @brief     This function disables the I2S input link.
- * @return   #HAL_I2S_STATUS_OK, if the operation is successful. The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
+ * @return    #HAL_I2S_STATUS_OK, if the operation is successful.  \n
+              The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
  * @sa        #hal_i2s_enable_rx()
  */
 hal_i2s_status_t hal_i2s_disable_rx(void);
@@ -1079,8 +1094,9 @@ hal_i2s_status_t hal_i2s_disable_rx(void);
 /**
  * @brief     This function receives data from the I2S input link.
  * @param[out] data is the data buffer to receive.
- * @return   #HAL_I2S_STATUS_OK, if the operation is successful. The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
- * @note       Call this function after #hal_i2s_get_rx_sample_count() function to ensure there is data available in the RX VFIFO buffer to perform read operation. 
+ * @return    #HAL_I2S_STATUS_OK, if the operation is successful. \n
+              The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
+ * @note      Call this function after #hal_i2s_get_rx_sample_count() function to ensure there is data available in the RX VFIFO buffer to perform read operation. 
  * @sa        #hal_i2s_get_rx_sample_count()
  */
 hal_i2s_status_t hal_i2s_rx_read(uint32_t *data);
@@ -1088,8 +1104,9 @@ hal_i2s_status_t hal_i2s_rx_read(uint32_t *data);
 
 /**
  * @brief      This function queries length of the received data available in the RX VFIFO.
- * @param[out] sample_count is the length of the received data available in the RX VFIFO.
- * @return     #HAL_I2S_STATUS_OK, if the operation is successful. The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
+ * @param[out] sample_count is the length of the received data available in the RX VFIFO. 
+ * @return     #HAL_I2S_STATUS_OK, if the operation is successful. \n
+               The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
  * @note       Call this function before #hal_i2s_rx_read() function to ensure there is data available in the RX VFIFO buffer to perform read operation. 
  * @sa         #hal_i2s_rx_read()
  */
@@ -1098,7 +1115,7 @@ hal_i2s_status_t hal_i2s_get_rx_sample_count(uint32_t *sample_count);
 /**
  * @brief     This function receives data from the I2S input link.
  * @param[in] buffer is a pointer to the user's data buffer.
- * @param[in] sample_count is the number of received samples.
+ * @param[in] sample_count is the number of received samples. (in bytes)
  * @return    #HAL_I2S_STATUS_INVALID_PARAMETER, if input parameter sample_count is zero or greater than the size of the data available in the RX buffer. 
               For more details about the parameter sample_count, please refer to #hal_i2s_get_rx_sample_count(). \n
               #HAL_I2S_STATUS_ERROR, when any error occurred during data read operation. \n
@@ -1110,8 +1127,9 @@ hal_i2s_status_t hal_i2s_rx_read(void *buffer, uint32_t sample_count);
 
 /**
  * @brief      This function queries the available data for an input.
- * @param[out] sample_count is the number of received samples.
- * @return     #HAL_I2S_STATUS_OK, if the operation is successful. The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
+ * @param[out] sample_count is the number of received samples. (in bytes)
+ * @return     #HAL_I2S_STATUS_OK, if the operation is successful. \n
+               The return value is reserved for further expansion. The current value is always set to #HAL_I2S_STATUS_OK.
  * @note       Call this function before #hal_i2s_rx_read() function to ensure there is data available in the RX buffer to perform read operation. 
  * @sa         #hal_i2s_rx_read()
  */

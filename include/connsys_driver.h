@@ -177,9 +177,6 @@
 #define CONNSYS_DBG_PORT    (1<<3)
 #define CONNSYS_DBG_MAX_NUM 3
 
-#define HEX_DUMP_CONNSYS(str, pSrcBufVA, SrcBufLen, u4DebugBit) hex_dump_connsys(str, pSrcBufVA, SrcBufLen, u4DebugBit)
-
-
 
 typedef struct{
     uint32_t             WHISR_reg_val;
@@ -435,7 +432,6 @@ int32_t connsys_tx_flow_control_check_and_update_tx(int32_t port, uint32_t pkt_l
 void connsys_tx_flow_control_config(uint8_t hif_tx_flow_ctrl_en);
 void connsys_tx_flow_control_set_reserve_page(uint32_t reserve_page);
 
-void hex_dump_connsys(int8_t *str, uint8_t *pSrcBufVA, uint32_t SrcBufLen, uint32_t feature);
 void connsys_show_config_option(void);
 void connsys_dump_cr(void);
 void connsys_print_stat(void);
@@ -450,7 +446,9 @@ void connsys_set_headroom_offset(uint8_t qos_enable, uint8_t offset);
 
 #if (CFG_CONNSYS_MEASURE_INT_TIME_EN == 1)
 void connsys_measure_time_set(uint8_t idx);
+#ifdef MTK_MINICLI_ENABLE
 void connsys_measure_time_show(void);
+#endif
 void connsys_measure_time_finish(void);
 void connsys_measure_time_set_pkt_time(uint8_t port, uint8_t idx);
 void connsys_measure_time_set_pkt_num(uint8_t port, uint8_t num);

@@ -28,7 +28,7 @@
  * OR REFUND ANY SOFTWARE LICENSE FEES OR SERVICE CHARGE PAID BY RECEIVER TO
  * MEDIATEK FOR SUCH MEDIATEK SOFTWARE.
  */
-
+ 
 #ifndef __HAL_MD5_H__
 #define __HAL_MD5_H__
 #include "hal_platform.h"
@@ -40,7 +40,7 @@
  * @addtogroup MD5
  * @{
  * This section introduces the MD5 driver APIs including terms and acronyms,
- * supported features, software architecture, details on how to use this driver. MD5 function groups, enumes, structures and functions.
+ * supported features, software architecture, details on how to use this driver. MD5 function groups, enums, structures and functions.
  *
  * @section HAL_MD5_Terms_Chapter Terms and acronyms
  *
@@ -136,10 +136,10 @@ typedef struct {
 hal_md5_status_t hal_md5_init(hal_md5_context_t *context);
 
 /**
- * @brief     The function appends data for MD5 operation.
+ * @brief     This function appends data for MD5 operation.
  * @param[in]  context is the context used in the MD5 operation.
  * @param[in]  message is the source data buffer.
- * @param[in]  length is the length of data.
+ * @param[in]  length is the length of the parameter message.
  * @param[out]  context is the context used in the MD5 operation.
  * @return if OK,  returns #HAL_MD5_STATUS_OK
  * @par    Example

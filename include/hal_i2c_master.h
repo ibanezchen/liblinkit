@@ -74,7 +74,7 @@
  *  #hal_pinmux_set_function to select the pinmux function. After setting the pinmux, call #hal_i2c_master_get_running_status() to check the I2C
  *  status. If the status is #HAL_I2C_STATUS_BUS_BUSY, wait till the status becomes #HAL_I2C_STATUS_IDLE. Once the data is successfully
  *  transmitted, call #hal_i2c_master_deinit() to release the I2C resource for other users. Steps are shown below:
- *  - Step1: Call #hal_pinmux_set_function() to set GPIO pinmux. 
+ *  - Step1: Call #hal_pinmux_set_function() to set GPIO pinmux if NOT use EPT tool. 
  *  - Step2: Call #hal_i2c_master_init() to initialize one I2C master.
  *  - Step3: Call #hal_i2c_master_send_polling() to send data in a polling mode.
  *  - Step4: Call #hal_i2c_master_receive_polling() to receive data in a polling mode.
@@ -105,7 +105,7 @@
  *  status. If the status is #HAL_I2C_STATUS_BUS_BUSY, user should wait till the status is #HAL_I2C_STATUS_IDLE, then
  *  call #hal_i2c_master_register_callback() to register a callback function. Once the data transaction is finished,
  *  call #hal_i2c_master_deinit() in your callback function which is registered by #hal_i2c_master_register_callback() to release the I2C resource to other users. Steps are shown below:
- *  - Step1: Call #hal_pinmux_set_function() to set GPIO pinmux. 
+ *  - Step1: Call #hal_pinmux_set_function() to set GPIO pinmux if NOT use EPT tool. 
  *  - Step2: Call #hal_i2c_master_init() to initialize one I2C master.
  *  - Step3: Call #hal_i2c_master_register_callback() to register a user callback.
  *  - Step4: Call #hal_i2c_master_send_dma() to send data within a polling mode.

@@ -60,7 +60,68 @@
  * @}
  */ 
 
-
+#ifdef HAL_EINT_FEATURE_MASK
+/** 
+ * @addtogroup HAL
+ * @{
+ * @addtogroup EINT
+ * @{
+ *
+ * @section HAL_EINT_Architecture_Chapter Software architecture of EINT
+ * 
+ * For the architecture diagram please refer @ref HAL_Overview_3_Chapter.
+ * 
+ *  
+ * @section HAL_EINT_Driver_Usage_Chapter How to use this driver
+ * 
+ * - Use EINT. \n
+ *  - Step1: Call hal_pinmux_set_function() to set the @ref GPIO pinmux. About the hal_pinmux_set_function(), for more information please refer to GPIO API document.\n
+ *  - Step2: Call hal_eint_mask mask the selected EINT source. \n
+ *  - Step3: initialize the selected EINT source. \n
+ *      Call hal_eint_init() to configue the EINT number's trigger mode and debounce time, or call hal_eint_set_trigger_mode() and hal_eint_set_debounce_time() to replace.
+ *  - Step4: regist a callback function \n 
+ *      Call hal_eint_register_callback() to register a user callback function.
+ *  - Step5: unmask an eint \n
+         Call hal_eint_unmask() to unmask an eint.
+ *  - Sample code:
+ *    @code
+ *       hal_pinmux_set_function(gpio_pin, function_index);   //select GPIO and set pinmux.
+ *       hal_eint_mask(eint_number);
+ *       ret = hal_eint_init(eint_number, &eint_config);          //set EINT trigger mode and debounce time.
+ *       if (HAL_EINT_STATUS_OK !=  ret) {
+ *               //error handle;
+ *       }
+ *       ret = hal_eint_register_callback(eint_number, callback, user_data); // register a user callback.
+ *       if (HAL_EINT_STATUS_OK !=  ret) {
+ *               //error handle;
+ *       }
+ *       ret = hal_eint_unmask(eint_number);
+ *
+ *       //change trigger mode or debounce time at running time.
+ *       hal_eint_mask(eint_number);
+ *       ret = hal_eint_set_trigger_mode(eint_number, callback, user_data); // change trigger mode at running time.
+ *       if (HAL_EINT_STATUS_OK !=  ret) {
+ *               //error handle;
+ *       } 
+ *       ret = hal_eint_set_debounce_time(eint_number, callback, user_data); //change debounce time at running time.
+ *       if (HAL_EINT_STATUS_OK !=  ret) {
+ *               //error handle;
+ *       } 
+ *       ret = hal_eint_unmask(eint_number);
+ *    @endcode
+ *    @code
+ *       //Callback function. This function should be registered with #hal_eint_register_callback().
+ *       void callback(void *user_data) 
+ *       {
+ *           //mask eint_nubmer at first.
+ *           hal_eint_mask(eint_number);
+ *           // user's handler
+ *           //please call hal_eint_unmask to unmask eint_number if want recieve the eint interrupt.
+ *           hal_eint_unmask(eint_nubmer);
+ *       }
+ *    @endcode
+ */
+#else
 /** 
  * @addtogroup HAL
  * @{
@@ -82,16 +143,41 @@
  *      Call hal_eint_register_callback() to register a user callback function.
  *  - Sample code:
  *    @code
- *       ret = hal_gpio_init(gpio_pin); 
- *       hal_pinmux_set_function(gpio_pin, function_index); //select GPIO and set pinmux
- *       ret = hal_eint_init(eint_number, &eint_config);    //set EINT trigger mode and debounce time.
+ *       hal_pinmux_set_function(gpio_pin, function_index);   //select GPIO and set pinmux
+ *       ret = hal_eint_init(eint_number, &eint_config);      //set EINT trigger mode and debounce time.
+ *       if (HAL_EINT_STATUS_OK !=  ret) {
+ *               //error handle;
+ *       }
  *       ret = hal_eint_register_callback(eint_number, callback, user_data); // register a user callback.
- *       ret = hal_eint_set_trigger_mode(eint_number, trigger_mode);         // set trigger mode
- *       ret = hal_eint_set_debounce_time(eint_number, time_ms);             // set debounce time
- *    @endcode
+ *       if (HAL_EINT_STATUS_OK !=  ret) {
+ *               //error handle;
+ *       }
  *
+ *       //change trigger mode or debounce time at running time.
+ *       ret = hal_eint_set_trigger_mode(eint_number, callback, user_data); // change trigger mode at running time.
+ *       if (HAL_EINT_STATUS_OK !=  ret) {
+ *               //error handle;
+ *       } 
+ *       ret = hal_eint_set_debounce_time(eint_number, callback, user_data); //change debounce time at running time.
+ *       if (HAL_EINT_STATUS_OK !=  ret) {
+ *               //error handle;
+ *       }
+ *
+ *    @endcode
+.*
+ *    @code
+ *       //Callback function. This function should be registered with #hal_eint_register_callback().
+ *       void callback(void *user_data) 
+ *       {
+ *           //mask eint_nubmer at first.
+ *           hal_eint_mask(eint_number);
+ *           // user's handler
+ *           //please call hal_eint_unmask to unmask eint_number if want recieve the eint interrupt.
+ *           hal_eint_unmask(eint_nubmer);
+ *       }
+ *    @endcode
  */
-
+#endif
 
 #ifdef __cplusplus
     extern "C" {
@@ -126,7 +212,7 @@ typedef enum {
   */
   
   
-/** @defgroup hal_wdt_struct Struct
+/** @defgroup hal_eint_struct Struct
   * @{
   */
 
@@ -172,7 +258,7 @@ typedef void (*hal_eint_callback_t)(void *user_data);
  * @par       Example
  * Sample code please refer to @ref HAL_EINT_Driver_Usage_Chapter
 */
-hal_eint_status_t hal_eint_init(hal_eint_number_t eint_number, hal_eint_config_t *eint_config);
+hal_eint_status_t hal_eint_init(hal_eint_number_t eint_number, const hal_eint_config_t *eint_config);
 
 
 /**

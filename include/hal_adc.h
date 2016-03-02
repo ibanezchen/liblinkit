@@ -28,7 +28,7 @@
  * OR REFUND ANY SOFTWARE LICENSE FEES OR SERVICE CHARGE PAID BY RECEIVER TO
  * MEDIATEK FOR SUCH MEDIATEK SOFTWARE.
  */
- 
+
 #ifndef __HAL_ADC_H__
 #define __HAL_ADC_H__
 #include "hal_platform.h"
@@ -51,7 +51,8 @@
  * |\b ADC                        | ADC is an Analog-to-Digital Converter that converts a continuous physical quantity (usually voltage) to a digital number that represents the quantity's amplitude.|
  *
  * @section HAL_ADC_Features_Chapter Supported features
- * The ADC is a 12-bit, <a href="https://en.wikipedia.org/wiki/Successive_approximation_ADC">Successive Approximation ADC </a>. Only polling mode is supported in this ADC driver. The supported channels vary based on the actual MCU devices used.
+ * The ADC is a <a href="https://en.wikipedia.org/wiki/Successive_approximation_ADC">Successive Approximation ADC </a>. The supported channels vary based on the actual MCU devices used. 
+ * Resolution of MT2523 and MT7687 is 12 bits.
  * - \b Retrieve \b ADC \b data \b for \b a \b channel. \n
  *   Call hal_adc_get_data_polling() function to get data for a channel. Only one sample data is retrieved at a time.
  *
@@ -63,7 +64,7 @@
  *   - Sample code:
  *   @code
  *
- * 	 uint16_t adc_data;
+ * 	 uint32_t adc_data;
  *
  * 	 hal_pinmux_set_function(HAL_GPIO_0, 2);//Set GPIO 0 to an ADC work mode. For more details, please refer to hal_pinmux_set_function().
  * 	 hal_adc_init();//Initialize ADC module.
@@ -90,7 +91,8 @@ extern "C" {
 
 /** @brief This enum defines the ADC API return status*/
 typedef enum {
-    HAL_ADC_STATUS_INVALID_PARAMETER = -3,      /**< Invalid parameter */
+    HAL_ADC_STATUS_INVALID_PARAMETER = -4,      /**< Invalid parameter */
+    HAL_ADC_STATUS_ERROR_BUSY = -3,             /**< ADC is busy */
     HAL_ADC_STATUS_ERROR_CHANNEL = -2,          /**< ADC channel number error */
     HAL_ADC_STATUS_ERROR = -1,                  /**< ADC error */
     HAL_ADC_STATUS_OK = 0                       /**< ADC ok */
@@ -112,9 +114,11 @@ typedef enum {
  *****************************************************************************/
 
 /**
- * @brief 	ADC init function.
+ * @brief    ADC init function.
  * @return
- * #HAL_ADC_STATUS_OK, ADC init success.
+ * #HAL_ADC_STATUS_OK, ADC init success. \n
+ * #HAL_ADC_STATUS_ERROR_BUSY, ADC is busy. \n
+ * #HAL_ADC_STATUS_ERROR, ADC clock enable failed.
  */
 hal_adc_status_t hal_adc_init(void);
 
@@ -122,7 +126,8 @@ hal_adc_status_t hal_adc_init(void);
 /**
 * @brief 	ADC deinit function. This function resets the ADC peripheral registers to their default values.
 * @return
-* #HAL_ADC_STATUS_OK, ADC deinit success.
+* #HAL_ADC_STATUS_OK, ADC deinit success. \n
+* #HAL_ADC_STATUS_ERROR, ADC clock disable failed.
 */
 hal_adc_status_t hal_adc_deinit(void);
 
@@ -133,12 +138,13 @@ hal_adc_status_t hal_adc_deinit(void);
  * @param[out] data is the raw data of the channel.
  * @return
  * #HAL_ADC_STATUS_OK, ADC get data success. \n
- * #HAL_ADC_STATUS_ERROR_CHANNEL, the channel number is invalid.
+ * #HAL_ADC_STATUS_ERROR_CHANNEL, the channel number is invalid. \n
+ * #HAL_ADC_STATUS_INVALID_PARAMETER, data is NULL.
  * @note Call hal_pinmux_set_function() to set the corresponding pin to operate on an ADC mode, before using an ADC peripheral. For more details, please refer to hal_pinmux_set_function() in @ref GPIO module.
  * @par Example
  * Sample code please refer to Use ADC driver to get sample data for a channel of @ref HAL_ADC_Driver_Usage_Chapter
  */
-hal_adc_status_t hal_adc_get_data_polling(hal_adc_channel_t channel, uint16_t *data);
+hal_adc_status_t hal_adc_get_data_polling(hal_adc_channel_t channel, uint32_t *data);
 
 
 #ifdef __cplusplus

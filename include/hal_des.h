@@ -28,7 +28,7 @@
  * OR REFUND ANY SOFTWARE LICENSE FEES OR SERVICE CHARGE PAID BY RECEIVER TO
  * MEDIATEK FOR SUCH MEDIATEK SOFTWARE.
  */
-
+ 
 #ifndef __HAL_DES_H__
 #define __HAL_DES_H__
 #include "hal_platform.h"
@@ -61,7 +61,7 @@
  *
  * @section HAL_DES_Driver_Usage_Chapter How to use this driver
  *
- * - Use AES in the CBC mode to encrypt() and decrypt. \n
+ * - Use AES in the CBC mode to encrypt and decrypt. \n
  *  - Step1: Call #hal_des_cbc_encrypt() to encrypt.
  *  - Step2: Call #hal_des_cbc_decrypt() to decrypt.
  *  - sample code:

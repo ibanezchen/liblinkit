@@ -49,6 +49,8 @@
 
 #if !defined(MTK_HAL_PLAIN_LOG_ENABLE)
 #include "syslog.h"
+#else
+#include "stdio.h"
 #endif /* !defined(MTK_HAL_PLAIN_LOG_ENABLE) */
 
 #ifdef __cplusplus
@@ -62,7 +64,7 @@ extern "C" {
 #define log_hal_create(_level)                      log_create_module(hal, (_level))
 #define log_hal_fatal(_message,...)                 LOG_E(hal, (_message), ##__VA_ARGS__)
 #define log_hal_error(_message,...)                 LOG_E(hal, (_message), ##__VA_ARGS__)
-#define log_hal_warning(_message,...)                 LOG_W(hal, (_message), ##__VA_ARGS__)
+#define log_hal_warning(_message,...)               LOG_W(hal, (_message), ##__VA_ARGS__)
 #define log_hal_info(_message,...)                  LOG_I(hal, (_message), ##__VA_ARGS__)
 #define log_hal_dump(_message, _data, _len, ...)    LOG_HEXDUMP_I(hal, (_message), (_data), (_len), ##__VA_ARGS__)
 #define log_hal_config_print_switch(_switch)        log_config_print_switch(hal, (_switch))
@@ -74,10 +76,11 @@ extern "C" {
 #else /* !defined(MTK_HAL_PLAIN_LOG_ENABLE) */
 
 
+
 #define log_hal_create(_level)
 #define log_hal_fatal(_message...)                  do { printf(_message); } while (0)
 #define log_hal_error(_message...)                  do { printf(_message); } while (0)
-#define log_hal_warning(_message...)                  do { printf(_message); } while (0)
+#define log_hal_warning(_message...)                do { printf(_message); } while (0)
 #define log_hal_info(_message...)                   do { printf(_message); } while (0)
 #define log_hal_dump(_message, _data, _len, ...)    do {} while (0)
 #define log_hal_config_print_switch(_switch)        do {} while (0)

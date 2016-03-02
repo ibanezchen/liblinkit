@@ -176,9 +176,10 @@ hal_flash_status_t hal_flash_read(uint32_t start_address, uint8_t *buffer, uint3
 
 /**
  * @brief     flash write
- * @param[in]  start_address, starting address to write from
+ * @param[in]  start_address, starting address to write from.Before the address can be written to for the first time,
+ *            the address located sector or block must first be erased.
  * @param[in]  length, data length
- * @param[in]  data, source data to be written
+ * @param[in]  data, source data to be written(Important: data must locate on ram because flash is not accessible during write opreation)
  * @return
  * #HAL_FLASH_STATUS_OK on success
  */

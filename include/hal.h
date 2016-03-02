@@ -101,7 +101,7 @@
  *
  *
  *
- * @section HAL_Overview_3_Chapter	 HAL Driver Convention
+ * @section HAL_Overview_3_Chapter	 HAL Driver Model
  * Some of the drivers can operate in multiple modes: polling, interrupt.
  * The UART HAL driver, for example, can operate in polling and interrupt modes during data communication. The polling mode is suitable for read and write operation of small amount of data in low frequency. The interrupt mode is suitable for read and write operation of small amount of data in high frequency. In UART DMA mode, for example, an interrupt is triggered once the DMA completes.
  * - \b Polling \b mode \b architecture.\n

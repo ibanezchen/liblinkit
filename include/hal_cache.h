@@ -28,7 +28,7 @@
  * OR REFUND ANY SOFTWARE LICENSE FEES OR SERVICE CHARGE PAID BY RECEIVER TO
  * MEDIATEK FOR SUCH MEDIATEK SOFTWARE.
  */
- 
+
 #ifndef __HAL_CACHE_H__
 #define __HAL_CACHE_H__
 #include "hal_platform.h"
@@ -57,7 +57,7 @@
  * |\b AHB              	      | Advanced High-performance Bus (AHB) is a bus protocol introduced in <a href="http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ihi0011a/index.html">Advanced Microcontroller Bus Architecture version 2</a> published by ARM Ltd company.|
  *
  * @section HAL_CACHE_Features_Chapter Supported features
- * The CACHE is a fixed write through CACHE, with maximum size of 32KB. Features supported by this module are listed below:
+ * Features supported by this module are listed below:
  *
  * - \b Configure \b the \b overall \b CACHE \b size.\n
  *   To reach the optimum system performance, the CACHE size can be set with flexibility. If the CACHE size is not set to the maximum (32KB), then the memory of the unused CACHE is reused by TCM.
@@ -84,7 +84,7 @@
  *
  * - \b Use \b CACHE \b driver \b to \b enable/disable \b CACHE.
  *  - hal_cache_region_enable()/ hal_cache_region_disable() is used to enable/disable cacheable attribute for a specified region.
- *  - hal_cache_enable()/ hal_cache_disable() is used to enable/disable the CACHE controller. If disabled, MCU memory accesses are all non-cacheable, i.e. they go through the AHB bus (except for TCM access). If enabled, the settings in CACHE controller will take effect. If MCU accesses a cacheable memory region, the CACHE controller returns the data in CACHE if it is found in CACHE and gets the data through the AHB bus only if a CACHE miss occurs.
+ *  - hal_cache_enable()/ hal_cache_disable() is used to enable/disable the CACHE controller. If disabled, MCU memory accesses are all non-cacheable. If enabled, the settings in CACHE controller will take effect.
  *
  * - \b Use \b CACHE \b driver \b to \b set \b a \b cacheable \b region.
  *  - Step1: Call hal_cache_set_size() to set the total size to be used for CACHE.
@@ -110,7 +110,7 @@
  *
  * - \b Use \b CACHE \b driver \b to \b invalidate/flush \b a \b cacheable \b region.\n
  *   - Step1: Call hal_cache_flush_multiple_cache_lines() to flush a cacheable memory specified by address and length.
- *  \n Call hal_cache_flush_one_cache_line() instead if just one line needs to be invalidated.
+ *  \n Call hal_cache_flush_one_cache_line() instead if just one line needs to be flushed.
  *   - Step2: Call hal_cache_invalidate_multiple_cache_lines() to invalidate a cacheable memory specified by address and length.
  *  \n Call hal_cache_invalidate_one_cache_line() instead if just one line needs to be invalidated.
  *   - Sample code:
@@ -154,6 +154,8 @@ extern "C" {
 
 /** @brief This enum defines the CACHE API return status*/
 typedef enum {
+    HAL_CACHE_STATUS_INVALID_PARAMETER = -7,    /**< Invalid parameter */
+    HAL_CACHE_STATUS_ERROR_BUSY = -6,           /**< CACHE is busy */
     HAL_CACHE_STATUS_ERROR_CACHE_SIZE = -5,     /**< CACHE size is invalid, total CACHE size is not a value of type #hal_cache_size_t*/
     HAL_CACHE_STATUS_ERROR_REGION = -4,         /**< CACHE region error, CACHE region is not a value of type #hal_cache_region_t */
     HAL_CACHE_STATUS_ERROR_REGION_ADDRESS = -3, /**< CACHE region address error, CACHE region address is not 4KB aligned */
@@ -223,7 +225,8 @@ typedef struct {
 /**
  * @brief 	CACHE initialization function, set the default cacheable attribute for the project memory layout.
  * @return
- * #HAL_CACHE_STATUS_OK, CACHE initialization is successful.
+ * #HAL_CACHE_STATUS_OK, CACHE initialization is successful. \n
+ * #HAL_CACHE_STATUS_ERROR_BUSY, CACHE is busy.
  */
 hal_cache_status_t hal_cache_init(void);
 
@@ -239,7 +242,8 @@ hal_cache_status_t hal_cache_deinit(void);
 /**
  * @brief 	CACHE enable function. Enable the CACHE settings during a memory access. @sa hal_cache_region_disable().
  * @return
- * #HAL_CACHE_STATUS_OK, CACHE enable is successful.
+ * #HAL_CACHE_STATUS_OK, CACHE enable is successful. \n
+ * #HAL_CACHE_STATUS_ERROR_CACHE_SIZE, CACHE can not be enabled when CACHE size is 0KB.
  */
 hal_cache_status_t hal_cache_enable(void);
 
@@ -257,7 +261,8 @@ hal_cache_status_t hal_cache_disable(void);
  * @param[in] region is the enabled region, this parameter can only be a value of type #hal_cache_region_t.
  * @return
  * #HAL_CACHE_STATUS_OK, CACHE region enable is successful. \n
- * #HAL_CACHE_STATUS_ERROR_REGION, the region is invalid.
+ * #HAL_CACHE_STATUS_ERROR_REGION, the region is invalid. \n
+ * #HAL_CACHE_STATUS_ERROR, the region is not configured before enable.
  */
 hal_cache_status_t hal_cache_region_enable(hal_cache_region_t region);
 
@@ -287,26 +292,29 @@ hal_cache_status_t hal_cache_set_size(hal_cache_size_t cache_size);
  * @param[in] region_config is the configuration information of the region.
  * @return
  * #HAL_CACHE_STATUS_OK, CACHE region configuration is successful. \n
- * #HAL_CACHE_STATUS_ERROR_REGION, the region is invalid (no unused region is left). \n
+ * #HAL_CACHE_STATUS_INVALID_PARAMETER, region_config is NULL. \n
+ * #HAL_CACHE_STATUS_ERROR_REGION, the region is invalid. \n
  * #HAL_CACHE_STATUS_ERROR_REGION_SIZE, the region size is invalid. \n
  * #HAL_CACHE_STATUS_ERROR_REGION_ADDRESS, the region address is invalid.
  */
-hal_cache_status_t hal_cache_region_config(hal_cache_region_t region, hal_cache_region_config_t *region_config);
+hal_cache_status_t hal_cache_region_config(hal_cache_region_t region, const hal_cache_region_config_t *region_config);
 
 /**
  * @brief  Invalidate one CACHE line by address.
  * @param[in] address is the start address of the memory that is invalidated.
  * @return
  * #HAL_CACHE_STATUS_OK, CACHE invalidate is successful. \n
+ * #HAL_CACHE_STATUS_INVALID_PARAMETER, address is not CACHE line size aligned.
  */
 hal_cache_status_t hal_cache_invalidate_one_cache_line(uint32_t address);
 
 /**
  * @brief  Invalidate CACHE lines by address and length.
  * @param[in] address is the start address of the memory that is invalidated.
- * @param[in] length is the length of memory that to be invalidated. The unit of the memory length is in bytes and the CACHE line size alignment should not be of user's concern. Simply provide the actual length of memory that needs to be invalidated.
+ * @param[in] length is the length of memory that to be invalidated.The unit of the memory length is in bytes and both address and length must be CACHE line size aligned when the API is called.
  * @return
  * #HAL_CACHE_STATUS_OK, CACHE invalidate is successful. \n
+ * #HAL_CACHE_STATUS_INVALID_PARAMETER, either address or length is not CACHE line size aligned.
  */
 hal_cache_status_t hal_cache_invalidate_multiple_cache_lines(uint32_t address, uint32_t length);
 
@@ -323,15 +331,17 @@ hal_cache_status_t hal_cache_invalidate_all_cache_lines(void);
  * @param[in] address is the start address of the memory that is flushed.
  * @return
  * #HAL_CACHE_STATUS_OK, CACHE flush is successful. \n
+ * #HAL_CACHE_STATUS_INVALID_PARAMETER, address is not CACHE line size aligned.
  */
 hal_cache_status_t hal_cache_flush_one_cache_line(uint32_t address);
 
 /**
  * @brief  Flush CACHE lines by address and length.
  * @param[in] address is the start address of the memory that is flushed.
- * @param[in] length is the length of the memory that to be flushed. The unit of the memory length is in bytes and the CACHE line size alignment should not be of user's concern. Simply provide the actual length of memory that needs to be flushed.
+ * @param[in] length is the length of the memory that to be flushed. The unit of the memory length is in bytes and both address and length must be CACHE line size aligned when the API is called.
  * @return
  * #HAL_CACHE_STATUS_OK, CACHE flush is successful. \n
+ * #HAL_CACHE_STATUS_INVALID_PARAMETER, either address or length is not CACHE line size aligned.
  */
 hal_cache_status_t hal_cache_flush_multiple_cache_lines(uint32_t address, uint32_t length);
 

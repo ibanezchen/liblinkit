@@ -41,81 +41,98 @@
  * @{
  * @addtogroup IRTX
  * @{
- * This section describes the programming interfaces of the IRTX HAL driver.
+ *   This section introduces the IRTX APIs including terms and acronyms,
+ *   supported features, software architecture, details on how to use this driver, IRTX function groups, enums, structures and functions.
  *
  * @section HAL_IRTX_Terms_Chapter Terms and acronyms
  *
- * The following provides descriptions to the terms commonly used in the ADC driver and how to use the various functions.
+ * The following provides descriptions to the terms commonly used in the IRTX driver and how to use its various functions.
  *
  * |Terms                   |Details                                                                 |
  * |------------------------------|------------------------------------------------------------------------|
- * |\b IRTX                       | IRTX is Infrared Transmiter in short. The transmitter element of infrared radiation. |
+ * |\b IRTX                       | Infrared Transmitter is the transmitter element to send infrared radiation. For more information, please refer to <a href="https://en.wikipedia.org/wiki/Infrared_Data_Association"> introduction to IrDA in Wikipedia </a>. |
  *
  * @section HAL_IRTX_Features_Chapter Supported features
- * - \b Support \b nec, \b rc5, \b rc6 and \b pwd \b mode. \n
- *   MT7687 has four ways to encode:
- * - \b nec \b mode: nec encode format is one of widest used infrared protocols in the world. In this mode,
- *                   your can send nec mode code by hardware directly.
- * - \b rc5 \b mode: The Philips RC5 IR transmission protocol uses Manchester encoding of the message bits.
- *                   In this mode, you can send rc5 mode code directly.
- * - \b rc6 \b mode: Like RC-5 the new RC-6 protocol was also defined by Philips. In this mode, you can send
- *                   rc6 mode code by hardware directly.
- * - \b pwd \b mode: PWD is pulse-width-detection in short.In this mode, you can send any kind of code
- *                   by Infrared Radiation. The hardware will count the length of every wave. You can
- *                   know the cammand sent by calculate the length of wave.
+ * - \b Support \b NEC, \b RC5, \b RC6 and \b PWD \b modes. \n
+ *   MT7687 has four encoding modes:
+ * - \b The \b NEC \b mode: 
+ *   The NEC encoding format is one of the widely used infrared protocols. In this mode, the NEC
+ *   encoded code can be directly sent by the hardware.
+ * - \b The \b RC5 \b mode: 
+ *   The Philips RC5 IR transmission protocol uses Manchester encoding of the message bits.
+ *   In this mode, the RC5 encoded code can be directly sent by the hardware.
+ * - \b The \b RC6 \b mode: 
+ *   Similar to the RC-5 the new RC-6 protocol was also defined by Philips. In this mode, 
+ *   the RC6 encoded code can be directly sent by the hardware.
+ * - \b The \b PWD \b mode: 
+ *   PWD is Pulse width detection(PWD). In this mode, any type of code transmitted by infrared radiation
+ *   can be sent. The transmitted content can be determined using the wavelength.
  *
  * @section HAL_IRTX_Driver_Usage_Chapter How to use this driver
- * - Use IRTX in a nec mode. \n
- *  - step1: call #hal_pinmux_set_function to set GPIO33 to function 7.
- *  - step2: call #hal_irtx_send_nec_data to start the hardware.
- *  - sample code:
+ * - Use IRTX in the NEC mode. \n
+ *  - Step1: Call hal_irtx_init() to initialize the IRTX.
+ *  - Step2: Provide the right pin-mux settings.
+ *  - Step3: Call hal_irtx_send_nec_data() to start the hardware.
+ *  - Step4: Call hal_irtx_deinit() to deinitialize the IRTX.
+ *  - Sample code:
  *    @code
- *       hal_pinmux_set_function(HAL_GPIO_33, 7);//Set GPIO33 to IRTX mode.
+ *       hal_irtx_init();
+ *       hal_pinmux_set_function(HAL_GPIO_33, 7);//Sets the GPIO33 to IRTX mode.
  *       uint8_t data[HAL_IRTX_MAX_DATA_LENGTH] = {
  *           0xA5, 0xF0, 0xAF, 0x00,
  *           0xff, 0x00, 0xAA, 0x55
  *       };
- *       if (HAL_IRTX_OK != hal_irtx_send_nec_data(HAL_IRTX_REPEAT_DISABLE, //if you want to send data repeat,use #HAL_IRTX_REPEAT_ENABLE
- *                                                 data, 64)) {
+ *       if (HAL_IRTX_STATUS_OK != hal_irtx_send_nec_data(HAL_IRTX_REPEAT_DISABLE,
+ *                                                 data, 64)) {     //Use HAL_IRTX_REPEAT_ENABLE to send the data continuously.
  *           printf("hal_irtx_send_nec_data fail.\r\n");
  *       }
+ *     hal_irtx_deinit();
  *    @endcode
- * - Use IRTX in a rc5 mode. \n
- *  - step1: call #hal_pinmux_set_function to set GPIO33 to function 7.
- *  - step2: call #hal_irtx_send_rc5_data to start the hardware.
- *  - sample code:
+ * - Use IRTX in the RC5 mode. \n
+ *  - Step1: Call hal_irtx_init() to initialize the IRTX.
+ *  - Step2: Provide the right pin-mux settings.
+ *  - Step3: Call hal_irtx_send_rc5_data() to start the hardware.
+ *  - Step4: Call hal_irtx_deinit() to deinitialize the IRTX.
+ *  - Sample code:
  *    @code
- *       hal_pinmux_set_function(HAL_GPIO_33, 7);//Set GPIO33 to IRTX mode.
+ *       hal_irtx_init();
+ *       hal_pinmux_set_function(HAL_GPIO_33, 7);//Set the GPIO33 to IRTX mode.
  *       uint8_t data[HAL_IRTX_MAX_DATA_LENGTH] = {
  *           0xA5, 0xF0, 0xAF, 0x00,
  *           0xff, 0x00, 0xAA, 0x55
  *       };
- *       if (HAL_IRTX_OK != hal_irtx_send_rc5_data(HAL_IRTX_REPEAT_DISABLE, //if you want to send data repeat,use #HAL_IRTX_REPEAT_ENABLE
- *                                                 data, 64)) {
- *           printf("hal_irtx_send_rc5_data fail.\r\n");
+ *       if (HAL_IRTX_STATUS_OK != hal_irtx_send_rc5_data(HAL_IRTX_REPEAT_DISABLE,
+ *                                                 data, 64)) {  //Use HAL_IRTX_REPEAT_ENABLE to send the data continuously.
+ *           printf("hal_irtx_send_rc5_data fail.\r\n");   
  *       }
+ *     hal_irtx_deinit();
  *    @endcode
- * - Use IRTX in a rc6 mode. \n
- *  - step1: call #hal_pinmux_set_function to set GPIO33 to function 7.
- *  - step2: call #hal_irtx_send_rc6_data to start the hardware.
- *  - sample code:
+ * - Use IRTX in the RC6 mode. \n
+ *  - Step1: Call hal_irtx_init() to initialize the IRTX.
+ *  - Step2: Provide the right pin-mux settings.
+ *  - Step3: Call hal_irtx_send_rc6_data() to start the hardware.
+ *  - Step4: Call hal_irtx_deinit() to deinitialize the IRTX.
+ *  - Sample code:
  *    @code
- *       hal_pinmux_set_function(HAL_GPIO_33, 7);//Set GPIO33 to IRTX mode.
+ *       hal_irtx_init();
+ *       hal_pinmux_set_function(HAL_GPIO_33, 7);//Set the GPIO33 to IRTX mode.
  *       uint8_t data[HAL_IRTX_MAX_DATA_LENGTH] = {
  *           0xA5, 0xF0, 0xAF, 0x00,
  *           0xff, 0x00, 0xAA, 0x55
  *       };
- *       if (HAL_IRTX_OK != hal_irtx_send_rc6_data(HAL_IRTX_REPEAT_DISABLE, //if you want to send data repeat,use #HAL_IRTX_REPEAT_ENABLE
- *                                                 data, 64)) {
+ *       if (HAL_IRTX_STATUS_OK != hal_irtx_send_rc6_data(HAL_IRTX_REPEAT_DISABLE, 
+ *                                                 data, 64)) {  //Use HAL_IRTX_REPEAT_ENABLE to send the data continuously.
  *           printf("hal_irtx_send_rc6_data fail.\r\n");
  *       }
+ *     hal_irtx_deinit();
  *    @endcode
- * - Use IRTX in a pwd mode. \n
- *  - step1: create a callback function as isr_ir_tx just you like.
- *  - step2: call #hal_irtx_register_pulse_data_callback to regiseter callback function.
- *  - step3: call #hal_irtx_configure_pulse_data_carrier to set frequency and duty_cycle.
- *  - step4: call #hal_irtx_send_pulse_data to send data.
- *  - sample code:
+ * - Use IRTX in the PWD mode. \n
+ *  - Step1: Call hal_irtx_init() to initialize the IRTX.
+ *  - Step2: Call hal_irtx_register_pulse_data_callback() to register callback function.
+ *  - Step3: Call hal_irtx_configure_pulse_data_carrier() to set frequency and duty_cycle.
+ *  - Step4: Call hal_irtx_send_pulse_data() to send data.
+ *  - Step5: Call hal_irtx_deinit() to de-initialize the IRTX.
+ *  - Sample code:
  *    @code
  *       static void isr_ir_tx(void *arg)
  *       {
@@ -128,28 +145,28 @@
  *           17, 15, 34, 15, 17, 15, 34, 15, 34, 15, 17, 15, 34, 15, 17, 15,
  *           17, 15, 17, 15, 34, 15, 34, 15, 34
  *       };
- *
+ *       hal_irtx_init();
  *       printf("output Software Pluse Width IR \r\n");
- *       if (HAL_IRTX_OK != hal_irtx_register_pulse_data_callback(isr_ir_tx, NULL)) {
+ *       if (HAL_IRTX_STATUS_OK != hal_irtx_register_pulse_data_callback(isr_ir_tx, NULL)) {
  *           printf("hal_irtx_send_pulse_data failed.\r\n");
  *           return;
  *       }
  *
  *       uint16_t frequency = 40;//40KHz
  *       uint8_t duty_cycle = 25;// 25% duty cycle
- *       if (HAL_IRTX_OK != hal_irtx_configure_pulse_data_carrier(frequency, duty_cycle)) {
+ *       if (HAL_IRTX_STATUS_OK != hal_irtx_configure_pulse_data_carrier(frequency, duty_cycle)) {
  *           printf("hal_irtx_send_pulse_data failed.\r\n");
  *           return;
  *       }
  *
- *       uint8_t base_period = 80; // unit:0.5us, SWM_BP=80, PW_value saturate for NEC 9ms leading
- *       if (HAL_IRTX_OK != hal_irtx_send_pulse_data(base_period, data, data_number)) {
+ *       uint8_t base_period = 80; // unit:0.5us, SWM_BP=80, PW_value saturates for one cycle of the NEC leading code with duration of 9ms (high) and 4.5ms(low).
+ *       if (HAL_IRTX_STATUS_OK != hal_irtx_send_pulse_data(base_period, data, data_number)) {
  *           printf("hal_irtx_send_pulse_data failed.\r\n");
  *           return;    }
  *
  *       while (!ir_tx_done) {
- *       }//wait for the interrupt
- *
+ *       }//Wait for an interrupt
+ *      hal_irtx_deinit();
  *    @endcode
  *
  */
@@ -178,31 +195,31 @@ extern "C" {
   * @{
  */
 
-/** @brief irtx repeat mode */
+/** @brief The IRTX repeat mode */
 typedef enum {
     HAL_IRTX_REPEAT_ENABLE = 0,
     HAL_IRTX_REPEAT_DISABLE
 } hal_irtx_repeat_code_t;
 
 
-/** @brief irtx status */
+/** @brief The IRRX status */
 typedef enum {
     HAL_IRTX_STATUS_ERROR = -1,
     HAL_IRTX_STATUS_OK = 0
 } hal_irtx_status_t;
 
 
-/** @brief IRTX transaction error */
+/** @brief The IRRX transaction error */
 typedef enum {
     HAL_IRTX_EVENT_TRANSACTION_ERROR = -1,       /**< IRTX transaction error */
     HAL_IRTX_EVENT_TRANSACTION_SUCCESS = 0,      /**< IRTX transaction success */
 } hal_irtx_event_t;
 
 
-/** @brief IRTX  running status */
+/** @brief The IRRX running status */
 typedef enum {
     HAL_IRTX_IDLE = 0,                         /**< IRTX idle */
-    HAL_IRTX_BUSY = 1,                         /**<IRTX busy */
+    HAL_IRTX_BUSY = 1,                         /**< IRTX busy */
 } hal_irtx_running_status_t;
 
 
@@ -215,43 +232,40 @@ typedef enum {
    */
 
 /** @brief  This defines the callback function prototype.
- *          Register a callback function when in an interrupt mode , this function will be called in IRTX interrupt.
- *          service routine after a transaction is complete
+ *          Register a callback function when in an interrupt mode, this function is called in the IRTX interrupt
+ *          service routine after a transaction is complete.
  *  @param [in] event is the transaction event for the current transaction, application can get the transaction result from this parameter.
- *              For more details about the event type, please refer to #hal_irtx_event_t
- *  @param [in] user_data is a parameter provided  by the application .
+ *              For more details about the event type, please refer to #hal_irtx_event_t.
+ *  @param [in] user_data is a parameter provided by the application.
  */
 
 
 
-/** @brief irtx callback */
+/** @brief The IRTX callback */
 typedef void (*hal_irtx_pulse_data_callback_t)(hal_irtx_event_t event, void  *user_data);
 
-/**
-  * @}
- */
 
 /**
- * @brief    This function initializes the IRTX hardware clock
- * @return  To indicate whether this function call is successful or not.
- *               HAL_IRRX_STATUS_OK if the receive started successfully.
-                 HAL_IRRX_STATUS_INVALID_PARAM if callback is not specified.
+ * @brief    This function initializes the IRTX hardware clock.
+ * @return   Indicates whether this function call is successful or not.
+ *                If the return value is #HAL_IRTX_STATUS_OK, the operation completed successfully.
+ *                If the return value is #HAL_IRTX_STATUS_ERROR, the operation failed.
  * @par       Example
- * Sample code please refer to @ref Driver_Usage_Chapter
- * @sa  hal_pwm_deinit()
+ * Sample code please refer to @ref Driver_Usage_Chapter.
+ * @sa  hal_irtx_deinit()
  */
 
 hal_irtx_status_t hal_irtx_init(void);
 
 
 /**
- * @brief    This function de-initializes the IRTX hardware clock
- * @return  To indicate whether this function call is successful or not.
- *               #HAL_IRRX_STATUS_OK if the receive started successfully.
-                 #HAL_IRRX_STATUS_INVALID_PARAM if callback is not specified.
+ * @brief    This function deinitializes the IRTX hardware clock.
+ * @return   Indicates whether this function call is successful or not.
+ *                If the return value is #HAL_IRTX_STATUS_OK, the operation completed successfully.
+ *                If the return value is #HAL_IRTX_STATUS_ERROR, the operation failed.
  * @par       Example
- * Sample code please refer to @ref Driver_Usage_Chapter
- * @sa  hal_pwm_deinit()
+ * Sample code, please refer to @ref Driver_Usage_Chapter.
+ * @sa  hal_irtx_init()
  */
 
 hal_irtx_status_t hal_irtx_deinit(void);
@@ -259,15 +273,15 @@ hal_irtx_status_t hal_irtx_deinit(void);
 
 
 /**
- * @brief    send NEC ir data function.
- * @param[in] repeat_code  repeat code for NEC irtx.
+ * @brief    This function sends the data in the NEC encoding format.
+ * @param[in] repeat_code  repeat code for the NEC IRTX.
  * @param[in] data data to be sent.
- * @param[in] bit_length  data length in bit
- * @return   To indicate whether this function call is successful or not.
- *               #HAL_IRTX_STATUS_OK if sends  successfully.
-                 #HAL_IRTX_STATUS_INVALID_PARAM if invalid parameter.
+ * @param[in] bit_length  the number of bits in the message.
+ * @return   Indicates whether this function call is successful or not.
+ *                If the return value is #HAL_IRTX_STATUS_OK, the operation completed successfully.
+ *                If the return value is #HAL_IRTX_STATUS_ERROR, the operation failed.
  * @par       Example
- * Sample code please refer to @ref HAL_IRTX_Driver_Usage_Chapter 
+ * Sample code, please refer to @ref HAL_IRTX_Driver_Usage_Chapter. 
  */
 
 hal_irtx_status_t hal_irtx_send_nec_data(hal_irtx_repeat_code_t repeat_code,
@@ -277,15 +291,15 @@ hal_irtx_status_t hal_irtx_send_nec_data(hal_irtx_repeat_code_t repeat_code,
 
 
 /**
- * @brief    send RC5 ir data function.
- * @param[in] repeat_code  repeat code for RC5 irtx.
+ * @brief     This function sends the data in the RC5 encoding format.
+ * @param[in] repeat_code  repeat code for the RC5 IRTX.
  * @param[in] data the data content to be sent.
- * @param[in] bit_length  data length in bit
- * @return   To indicate whether this function call is successful or not.
- *               HAL_IRTX_STATUS_OK if sends  successfully.
-                 HAL_IRTX_STATUS_INVALID_PARAM if invalid parameter.
+ * @param[in] bit_length  the number of bits in the message.
+ * @return   Indicates whether this function call is successful or not.
+ *                If the return value is #HAL_IRTX_STATUS_OK, the operation completed successfully.
+ *                If the return value is #HAL_IRTX_STATUS_ERROR, the operation failed.
  * @par       Example
- * Sample code please refer to @ref HAL_IRTX_Driver_Usage_Chapter 
+ * Sample code, please refer to @ref HAL_IRTX_Driver_Usage_Chapter. 
  */
 
 hal_irtx_status_t hal_irtx_send_rc5_data(hal_irtx_repeat_code_t repeat_code,
@@ -294,15 +308,15 @@ hal_irtx_status_t hal_irtx_send_rc5_data(hal_irtx_repeat_code_t repeat_code,
 
 
 /**
- * @brief    send RC6 ir data function.
- * @param[in] repeat_code  repeat code for RC6 irtx.
+ * @brief    This function sends the data in the RC6 encoding format.
+ * @param[in] repeat_code  repeat code for the RC6 IRTX.
  * @param[in] data the data content to be sent.
- * @param[in] bit_length  data length in bit
- * @return   To indicate whether this function call is successful or not.
- *               #HAL_IRTX_STATUS_OK if sends  successfully.
-                 #HAL_IRTX_STATUS_INVALID_PARAM if invalid parameter.
+ * @param[in] bit_length  the number of bits in the message.
+ * @return   Indicates whether this function call is successful or not.
+ *                If the return value is #HAL_IRTX_STATUS_OK, the operation completed successfully.
+ *                If the return value is #HAL_IRTX_STATUS_ERROR, the operation failed.
  * @par       Example
- * Sample code please refer to @ref HAL_IRTX_Driver_Usage_Chapter 
+ * Sample code, please refer to @ref HAL_IRTX_Driver_Usage_Chapter. 
  */
 
 hal_irtx_status_t hal_irtx_send_rc6_data(hal_irtx_repeat_code_t repeat_code,
@@ -312,14 +326,14 @@ hal_irtx_status_t hal_irtx_send_rc6_data(hal_irtx_repeat_code_t repeat_code,
 
 
 /**
- * @brief    configure the pulse data carrier function.
+ * @brief    This function configures the pulse data carrier.
  * @param[in] frequency  pulse data carrier frequency.
- * @param[in] duty_cycle pulse data carrier duty cycle
- * @return   To indicate whether this function call is successful or not.
- *               #HAL_IRTX_STATUS_OK if sends  successfully.
-                 #HAL_IRTX_STATUS_INVALID_PARAM if invalid parameter.
+ * @param[in] duty_cycle pulse data carrier duty cycle.
+ * @return   Indicates whether this function call is successful or not.
+ *                If the return value is #HAL_IRTX_STATUS_OK, the operation completed successfully.
+ *                If the return value is #HAL_IRTX_STATUS_ERROR, the operation failed.
  * @par       Example
- * Sample code please refer to @ref HAL_IRTX_Driver_Usage_Chapter 
+ * Sample code, please refer to @ref HAL_IRTX_Driver_Usage_Chapter. 
  */
 
 hal_irtx_status_t hal_irtx_configure_pulse_data_carrier(uint32_t frequency,
@@ -327,43 +341,44 @@ hal_irtx_status_t hal_irtx_configure_pulse_data_carrier(uint32_t frequency,
 
 
 /**
- * @brief    register pulse data callback, which will be called after transmission completes.
+ * @brief    This function registers the PWD encoding format data callback. Call it after the transmission is complete.
  * @param[in] callback user defined callback function.
- * @param[in] user_data  user defined extension data
- * @return   To indicate whether this function call is successful or not.
- *               #HAL_IRTX_STATUS_OK if sends  successfully.
-                 #HAL_IRTX_STATUS_INVALID_PARAM if invalid parameter.
+ * @param[in] user_data  a user defined extension data.
+ * @return   Indicates whether this function call is successful or not.
+ *                If the return value is #HAL_IRTX_STATUS_OK, the operation completed successfully.
+ *                If the return value is #HAL_IRTX_STATUS_ERROR, the operation failed.
  * @par       Example
- * Sample code please refer to @ref HAL_IRTX_Driver_Usage_Chapter 
+ * Sample code, please refer to @ref HAL_IRTX_Driver_Usage_Chapter. 
  */
 
 hal_irtx_status_t hal_irtx_register_pulse_data_callback(hal_irtx_pulse_data_callback_t callback,
                                                         void *user_data);
 
 /**
- * @brief    send pulse data.
- * @param[in] base_period  base period for sending data.
- * @param[in] data  the data content to be sent
- * @param[in] length data length in byte
- * @return   To indicate whether this function call is successful or not.
- *               #HAL_IRTX_STATUS_OK if sends  successfully.
-                 #HAL_IRTX_STATUS_INVALID_PARAM if invalid parameter.
+ * @brief    This function sends the data in the PWD encoded format.
+ * @param[in] base_period  the base period for sending data.
+ * @param[in] data  the data content to be sent.
+ * @param[in] length data length in bytes.
+ * @return   Indicates whether this function call is successful or not.
+ *                If the return value is #HAL_IRTX_STATUS_OK, the operation completed successfully.
+ *                If the return value is #HAL_IRTX_STATUS_ERROR, the operation failed.
  * @par       Example
- * Sample code please refer to @ref HAL_IRTX_Driver_Usage_Chapter 
+ * Sample code, please refer to @ref HAL_IRTX_Driver_Usage_Chapter. 
  */
 
 hal_irtx_status_t hal_irtx_send_pulse_data(uint32_t base_period, uint8_t *data, uint32_t length);
 
 
 /**
- * @brief    This function is used to get the current state of the IRTX
+ * @brief    This function gets the current state of the IRTX.
  * @param[out] running_status is the current running status.
- *             #HAL_IRTX_BUSY means the IRTX is in busy status; \n
- *             #HAL_IRTX_IDLE means the IRTX is in idle status, user can use it to transfer data now.
- * @return   To indicate whether this function call is successful or not.
- *               If the return value is #HAL_IRTX_STATUS_OK, it means success.
+ *             #HAL_IRTX_BUSY means the IRTX is in busy state.
+ *             #HAL_IRTX_IDLE means the IRTX is in idle state, which can be used to transfer data immediately.
+ * @return   Indicates whether this function call is successful or not.
+ *                If the return value is #HAL_IRTX_STATUS_OK, the operation completed successfully.
+ *                If the return value is #HAL_IRTX_STATUS_ERROR, the operation failed.
  * @par       Example
- * Sample code please refer to @ref HAL_IRTX_Driver_Usage_Chapter 
+ * Sample code, please refer to @ref HAL_IRTX_Driver_Usage_Chapter. 
  */
 
 hal_irtx_status_t hal_irtx_get_running_status(hal_irtx_running_status_t *running_status);
@@ -374,12 +389,7 @@ hal_irtx_status_t hal_irtx_get_running_status(hal_irtx_running_status_t *running
     }
 #endif
 
-/**
- * @}
- * @}
-*/
-
+/** @}*/
 #endif /*HAL_IRTX_MODULE_ENABLED*/
 #endif /* __HAL_IRTX_H__ */
-
 

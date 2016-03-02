@@ -152,40 +152,18 @@
  *   - Step2 : Call hal_pinmux_set_function() to configure the pin to operate in GPIO mode.
  *   - Step3 : Call hal_gpio_set_direction() to configure the direction of GPIO.
  *   - Step4 : Call hal_gpio_set_output() to set the data to be output if direction is ouput.
- *             The output data of the pin can be read back and toggled if needed.
- *   - Step5 : Call hal_gpio_get_input() to get the input data if direction is input.
- *             The pin can be inversed and given a pull state including pull-up and pull-down if the direction is input.
+ *   - Step5 : Call hal_gpio_deinit() to deinitialize the pin.
  *   - sample code:
  *    @code
  *     void gpio_application(void)
  *     {
- *       hal_gpio_data_t gpio_data;
  *       hal_gpio_status_t ret;
- *       hal_gpio_direction_t dir;
  *       hal_pinmux_status_t ret_pinmux_status;
  *
  *       ret = hal_gpio_init(gpio_pin);
- *       ret_pinmux_status = hal_pinmux_set_function(gpio_pin, 0);
+ *       ret_pinmux_status = hal_pinmux_set_function(gpio_pin, function_index); //set the pin to work in GPIO mode
  *       ret = hal_gpio_set_direction(gpio_pin, HAL_GPIO_DIRECTION_OUTPUT);
- *       ret = hal_gpio_get_direction(gpio_pin, &dir);
- *
- *       if(HAL_GPIO_DIRECTION_OUTPUT == dir) {
- *               ret = hal_gpio_set_output(gpio_pin, HAL_GPIO_DATA_HIGH);
- *               ret = hal_gpio_get_output(gpio_pin, &gpio_data);
- *
- *               //toggle the output data if needed.
- *               ret = hal_gpio_toggle_pin(gpio_pin);
- *           }
- *       else {
- *                ret = hal_gpio_get_input(gpio_pin, &gpio_data);
- *
- *                //set the pin to pull-up state if needed.
- *                ret = hal_gpio_pull_up(gpio_pin);
- *
- *                //set the pin to pull-down state if needed.
- *                ret = hal_gpio_pull_down(gpio_pin);
- *                ret = hal_gpio_disable_pull(gpio_pin);
- *           }
+ *       ret = hal_gpio_set_output(gpio_pin, HAL_GPIO_DATA_HIGH);
  *       ret = hal_gpio_deinit(gpio_pin);
  *     }
  *    @endcode
@@ -202,15 +180,15 @@
  *  - \b operate \b in \b peripheral \b mode.
  *   - Step1 : Call hal_gpio_init() to initialize the pin.
  *   - Step2 : Call hal_pinmux_set_function() to configurethe pin to operate in peripheral mode.
+ *   - Step3 : Call hal_gpio_deinit() to deinitialize the pin.
  *   - sample code:
  *    @code
  *     void gpio_application(void)
  *     {
- *       hal_gpio_data_t gpio_data;
  *       hal_gpio_status_t ret;
  *       hal_pinmux_status_t ret_pinmux_status;
  *       ret = hal_gpio_init(gpio_pin);
- *       ret_pinmux_status = hal_pinmux_set_function(gpio_pin, function_index);
+ *       ret_pinmux_status = hal_pinmux_set_function(gpio_pin, function_index);   // set the pin to work in peripheral mode determined by parameter of function_index
  *       ret = hal_gpio_deinit(gpio_pin);
  *      }
  *   @endcode
@@ -222,7 +200,6 @@
 #ifdef __cplusplus
     extern "C" {
 #endif
- 
 
 /** @defgroup hal_gpio_enum Enum
   * @{
@@ -257,8 +234,8 @@ typedef enum {
 
 /** @brief This enum defines output clock mode of GPIO */
 typedef enum {
-    HAL_GPIO_CLOCK_MODE_26M = 0,        /**< define GPIO output clock mode as 26MHz */
-    HAL_GPIO_CLOCK_MODE_32K = 1,        /**< define GPIO output clock mode as 32KHz */
+    HAL_GPIO_CLOCK_MODE_26M = 1,        /**< define GPIO output clock mode as 26MHz */
+    HAL_GPIO_CLOCK_MODE_32K = 4,        /**< define GPIO output clock mode as 32KHz */
     HAL_GPIO_CLOCK_MODE_MAX             /**< define GPIO output clock mode of max number(invalid) */
 }hal_gpio_clock_mode_t;
 #endif
@@ -289,7 +266,7 @@ typedef enum {
 
 
 /**
- * @brief     This function is reserved to reduce power consumption, currently it does nothing.
+ * @brief     This function initializes the GPIO hardware with basic functionality. The target pin must be initialized before used.
  * @param[in] gpio_pin specifies pin number to init.
  * @return    To indicate whether this function call is successful or not, for example:
  *            If the return value is #HAL_GPIO_STATUS_OK, it means success;
@@ -302,7 +279,7 @@ hal_gpio_status_t hal_gpio_init(hal_gpio_pin_t gpio_pin);
 
 
 /**
- * @brief     This function is reserved to reduce power consumption, currently it does nothing.
+ * @brief     This function deinitializes the GPIO hardware to its default status. The target pin must be deinitialized if not used.
  * @param[in] gpio_pin specifies pin number to deinit.
  * @return    To indicate whether this function call is successful or not, for example:
  *            If the return value is #HAL_GPIO_STATUS_OK, it means success;
@@ -332,7 +309,7 @@ hal_pinmux_status_t hal_pinmux_set_function(hal_gpio_pin_t gpio_pin, uint8_t fun
 
 
 /**
- * @brief     This function is used to get input data of target GPIO.
+ * @brief     This function is used to get input data of target GPIO when the direction of the GPIO is input.
  * @param[in] gpio_pin specifies pin number to operate.
  * @param[in] gpio_data represents input data received from target GPIO.
  * @return    To indicate whether this function call is successful or not, for example:
@@ -362,7 +339,7 @@ hal_gpio_status_t hal_gpio_set_output(hal_gpio_pin_t gpio_pin, hal_gpio_data_t g
 
 
 /**
- * @brief     This function is used to get output data of target GPIO that is last set.
+ * @brief     This function is used to get output data of target GPIO which is last set when the direction of the GPIO is output.
  * @param[in] gpio_pin specifies pin number to operate.
  * @param[in] gpio_data represents output data of target GPIO.
  * @return    To indicate whether this function call is successful or not, for example:
@@ -419,20 +396,6 @@ hal_gpio_status_t hal_gpio_get_direction(hal_gpio_pin_t gpio_pin, hal_gpio_direc
  *            If the return value is #HAL_GPIO_STATUS_ERROR, it means failure.
  * @note
  * @warning
- * @par       Example
- * @code
- *
- *            hal_gpio_status_t ret;
- *            hal_gpio_direction_t dir;
- *            hal_pinmux_status_t ret_pinmux_status;
- *
- *            ret = hal_gpio_init(gpio_pin);
- *            ret_pinmux_status = hal_pinmux_set_function(gpio_pin, 0);
- *            ret = hal_gpio_set_direction(gpio_pin, HAL_GPIO_DIRECTION_INPUT);
- *            ret = hal_gpio_set_high_impedance(gpio_pin);
- *            ret = hal_gpio_deinit(gpio_pin);
- *
- * @endcode
  */
 hal_gpio_status_t hal_gpio_set_high_impedance(hal_gpio_pin_t gpio_pin);
 
@@ -451,14 +414,11 @@ hal_gpio_status_t hal_gpio_set_high_impedance(hal_gpio_pin_t gpio_pin);
  * @code
  *
  *            hal_gpio_status_t ret;
- *            hal_gpio_direction_t dir;
- *            hal_pinmux_status_t ret_pinmux_status;
  *
  *            ret = hal_gpio_init(gpio_pin);
- *            ret_pinmux_status = hal_pinmux_set_function(gpio_pin, 0);
- *            ret = hal_gpio_set_direction(gpio_pin, HAL_GPIO_DIRECTION_INPUT);
  *            ret = hal_gpio_set_high_impedance(gpio_pin);
- *            ret = hal_gpio_clear_high_impedance(gpio_pin);
+ *            // do something else
+ *            ret = hal_gpio_clear_high_impedance(gpio_pin); //put target GPIO out of high impedance state befor other configuration
  *            ret = hal_gpio_deinit(gpio_pin);
  *
  * @endcode
@@ -468,7 +428,7 @@ hal_gpio_status_t hal_gpio_clear_high_impedance(hal_gpio_pin_t gpio_pin);
 
 
 /**
- * @brief     This function is used to toggle output data of target GPIO, after this function, 
+ * @brief     This function is used to toggle output data of target GPIO when the direction of the pin is output. After this function,
  *            the output data of target GPIO will be inversed only one time.
  * @param[in] gpio_pin specifies pin number to toggle.
  * @return    To indicate whether this function call is successful or not, for example:
@@ -477,6 +437,18 @@ hal_gpio_status_t hal_gpio_clear_high_impedance(hal_gpio_pin_t gpio_pin);
  *            If the return value is #HAL_GPIO_STATUS_ERROR, it means failure.
  * @note
  * @warning
+ * @par       Example
+ * @code
+ *            hal_gpio_status_t ret;
+ *            hal_pinmux_status_t ret_pinmux_status;
+ *
+ *            ret = hal_gpio_init(gpio_pin);
+ *            ret_pinmux_status = hal_pinmux_set_function(gpio_pin, function_index); //set the pin to work in GPIO mode
+ *            ret = hal_gpio_set_direction(gpio_pin, HAL_GPIO_DIRECTION_OUTPUT);
+ *            ret = hal_gpio_set_output(gpio_pin, HAL_GPIO_DATA_HIGH);
+ *            ret = hal_gpio_toggle_pin(gpio_pin);  // output data of gpio_pin will be toggled to low from high
+ *            ret = hal_gpio_deinit(gpio_pin);
+ * @endcode
  */
 hal_gpio_status_t hal_gpio_toggle_pin(hal_gpio_pin_t gpio_pin);
 
@@ -493,16 +465,14 @@ hal_gpio_status_t hal_gpio_toggle_pin(hal_gpio_pin_t gpio_pin);
  * @note
  * @warning
  * @par       Example
- * @code      
+ * @code
  *            hal_gpio_status_t ret;
- *            hal_pinmux_status_t ret_pinmux_status;
  *
- *            ret = hal_gpio_init(gpio_pin); 
- *            ret_pinmux_status = hal_pinmux_set_function(gpio_pin, 0);
- *            ret = hal_gpio_set_direction(gpio_pin, HAL_GPIO_DIRECTION_INPUT);
+ *            ret = hal_gpio_init(gpio_pin);
  *            ret = hal_gpio_enable_inversion(gpio_pin);
+ *            // do something else
  *            ret = hal_gpio_disable_inversion(gpio_pin);
- *            ret = hal_gpio_deinit(gpio_pin); 
+ *            ret = hal_gpio_deinit(gpio_pin);
  * @endcode
  */
 hal_gpio_status_t hal_gpio_enable_inversion(hal_gpio_pin_t gpio_pin);
@@ -520,12 +490,10 @@ hal_gpio_status_t hal_gpio_enable_inversion(hal_gpio_pin_t gpio_pin);
  * @par       Example
  * @code
  *            hal_gpio_status_t ret;
- *            hal_pinmux_status_t ret_pinmux_status;
  *
  *            ret = hal_gpio_init(gpio_pin);
- *            ret_pinmux_status = hal_pinmux_set_function(gpio_pin, 0);
- *            ret = hal_gpio_set_direction(gpio_pin, HAL_GPIO_DIRECTION_INPUT);
  *            ret = hal_gpio_enable_inversion(gpio_pin);
+ *            // do something else
  *            ret = hal_gpio_disable_inversion(gpio_pin);
  *            ret = hal_gpio_deinit(gpio_pin);
  * @endcode
@@ -537,7 +505,7 @@ hal_gpio_status_t hal_gpio_disable_inversion(hal_gpio_pin_t gpio_pin);
 /**
  * @brief     This function is used to set target GPIO to pull-up state, after this function,
  *            the input data of target pin will be equivalent to high if the pin is left unconnected.
- *            This function only works on the pin which has only one pull-up resister and one pull-down resister.
+ *            This function only works on the pin which has only one pull-up resister resister.
  * @param[in] gpio_pin specifies pin number to set.
  * @return    To indicate whether this function call is successful or not, for example:
  *            If the return value is #HAL_GPIO_STATUS_OK, it means success;
@@ -545,6 +513,17 @@ hal_gpio_status_t hal_gpio_disable_inversion(hal_gpio_pin_t gpio_pin);
  *            If the return value is #HAL_GPIO_STATUS_ERROR, it means failure.
  * @note
  * @warning
+ * @par       Example
+ * @code
+ *            hal_gpio_status_t ret;
+ *            hal_pinmux_status_t ret_pinmux_status;
+ *
+ *            ret = hal_gpio_init(gpio_pin);
+ *            ret_pinmux_status = hal_pinmux_set_function(gpio_pin, function_index); //set the pin to work in GPIO mode
+ *            ret = hal_gpio_set_direction(gpio_pin, HAL_GPIO_DIRECTION_INPUT);
+ *            ret = hal_gpio_pull_up(gpio_pin);   //pull state of the target GPIO is set to pull-up
+ *            ret = hal_gpio_deinit(gpio_pin);
+ * @endcode
  */
 hal_gpio_status_t hal_gpio_pull_up(hal_gpio_pin_t gpio_pin);
 
@@ -552,7 +531,7 @@ hal_gpio_status_t hal_gpio_pull_up(hal_gpio_pin_t gpio_pin);
 /**
  * @brief     This function is used to set target GPIO to pull-down state, after this function,
  *            the input data of target pin will be equivalent to low if the pin is left unconnected.
- *            This function only works on the pin which has only one pull-up resister and one pull-down resister.
+ *            This function only works on the pin which has only one pull-down resister.
  * @param[in] gpio_pin specifies pin number to set.
  * @return    To indicate whether this function call is successful or not, for example:
  *            If the return value is #HAL_GPIO_STATUS_OK, it means success;
@@ -560,6 +539,17 @@ hal_gpio_status_t hal_gpio_pull_up(hal_gpio_pin_t gpio_pin);
  *            If the return value is #HAL_GPIO_STATUS_ERROR, it means failure.
  * @note
  * @warning
+ * @par       Example
+ * @code
+ *            hal_gpio_status_t ret;
+ *            hal_pinmux_status_t ret_pinmux_status;
+ *
+ *            ret = hal_gpio_init(gpio_pin);
+ *            ret_pinmux_status = hal_pinmux_set_function(gpio_pin, function_index); //set the pin to work in GPIO mode
+ *            ret = hal_gpio_set_direction(gpio_pin, HAL_GPIO_DIRECTION_INPUT);
+ *            ret = hal_gpio_pull_down(gpio_pin);   //pull state of the target GPIO is set to pull-down
+ *            ret = hal_gpio_deinit(gpio_pin);
+ * @endcode
  */
 hal_gpio_status_t hal_gpio_pull_down(hal_gpio_pin_t gpio_pin);
 
@@ -574,18 +564,29 @@ hal_gpio_status_t hal_gpio_pull_down(hal_gpio_pin_t gpio_pin);
  *            If the return value is #HAL_GPIO_STATUS_ERROR, it means failure.
  * @note
  * @warning
+ * @par       Example
+ * @code
+ *            hal_gpio_status_t ret;
+ *            hal_pinmux_status_t ret_pinmux_status;
+ *
+ *            ret = hal_gpio_init(gpio_pin);
+ *            ret_pinmux_status = hal_pinmux_set_function(gpio_pin, function_index); //set the pin to work in GPIO mode
+ *            ret = hal_gpio_set_direction(gpio_pin, HAL_GPIO_DIRECTION_INPUT);
+ *            ret = hal_gpio_pull_down(gpio_pin);
+ *            ret = hal_gpio_disable_pull(gpio_pin);   //pull state of the target GPIO is set to disable
+ *            ret = hal_gpio_deinit(gpio_pin);
+ * @endcode
  */
 hal_gpio_status_t hal_gpio_disable_pull(hal_gpio_pin_t gpio_pin);
 
 
 #ifdef HAL_GPIO_FEATURE_PUPD
 /**
- * @brief     This function is used to set pull up/down state of GPIO whose pull state is denpendent on GPIO_PUPD, GPIO_RESEN0 and GPIO_RESEN1
- *            the pull up/down state of GPIO is configured by combination of GPIO_PUPD, GPIO_RESEN0 and GPIO_RESEN1.
+ * @brief     This function is used to set pull up/down state of GPIO who has more than one pull-up or pull-down resister.
  * @param[in] gpio_pin specifies pin number to configure.
- * @param[in] gpio_pupd specifies value of GPIO_PUPD.
- * @param[in] gpio_r0 specifies value of GPIO_RESEN0.
- * @param[in] gpio_r1 specifies value of GPIO_RESEN1.
+ * @param[in] gpio_pupd specifies pull-up or pull-down of target GPIO.
+ * @param[in] gpio_r0 works with gpio_r1 to specify pull resister of target GPIO.
+ * @param[in] gpio_r1 works with gpio_r0 to specify pull resister of target GPIO.
  * @return    To indicate whether this function call is successful or not, for example:
  *            If the return value is #HAL_GPIO_STATUS_OK, it means success;
  *            If the return value is #HAL_GPIO_STATUS_ERROR_PIN, it means a wrong pin number is given, the parameter must be verified;
@@ -598,9 +599,9 @@ hal_gpio_status_t hal_gpio_disable_pull(hal_gpio_pin_t gpio_pin);
  *            hal_pinmux_status_t ret_pinmux_status;
  *
  *            ret = hal_gpio_init(gpio_pin);
- *            ret_pinmux_status = hal_pinmux_set_function(gpio_pin, 0);
+ *            ret_pinmux_status = hal_pinmux_set_function(gpio_pin, function_index); //set the pin to work in GPIO mode
  *            ret = hal_gpio_set_direction(gpio_pin, HAL_GPIO_DIRECTION_INPUT);
- *            ret = hal_gpio_set_pupd_register(gpio_pin,gpio_pupd,gpio_r0,gpio_r1);
+ *            ret = hal_gpio_set_pupd_register(gpio_pin,gpio_pupd,gpio_r0,gpio_r1); //pull state of the target GPIO is set to a state decided by combination of gpio_pupd,gpio_r0 and gpio_r1
  *            ret = hal_gpio_deinit(gpio_pin);
  * @endcode
  */
@@ -627,8 +628,8 @@ hal_gpio_status_t hal_gpio_set_pupd_register(hal_gpio_pin_t gpio_pin, uint8_t gp
  *            hal_pinmux_status_t ret_pinmux_status;
  *
  *            ret = hal_gpio_init(gpio_pin);
- *            ret_pinmux_status = hal_pinmux_set_function(gpio_pin, function_index);
- *            ret = hal_gpio_set_clockout(gpio_clock_num, clock_mode);
+ *            ret_pinmux_status = hal_pinmux_set_function(gpio_pin, function_index);  // set the pin to work in clock output mode
+ *            ret = hal_gpio_set_clockout(gpio_clock_num, clock_mode); // the pin will output clock on the frequency decided by clock_mode
  *            ret = hal_gpio_deinit(gpio_pin);
  * @endcode
  */

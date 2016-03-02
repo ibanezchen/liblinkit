@@ -41,18 +41,19 @@
     extern "C" {
 #endif
 
+
 /*****************************************************************************
 * module sub features define
 *****************************************************************************/
 
 #ifdef HAL_PWM_MODULE_ENABLED
     #define HAL_PWM_FEATURE_SINGLE_SOURCE_CLOCK        /*please not to modify*/
-#endif	
+#endif
 
 
 #ifdef HAL_RTC_MODULE_ENABLED
     #define HAL_RTC_FEATURE_SLEEP        /*please not to modify*/
-#endif	
+#endif
 
 #ifdef HAL_UART_MODULE_ENABLED
     #define HAL_UART_FEATURE_VFIFO_DMA_TIMEOUT        /*please not to modify*/
@@ -65,9 +66,8 @@
 
 
 
-
-#ifdef HAL_UART_MODULE_ENABLED 
-/** 
+#ifdef HAL_UART_MODULE_ENABLED
+/**
  * @addtogroup HAL
  * @{
  * @addtogroup UART
@@ -75,8 +75,8 @@
  * @addtogroup hal_uart_enum Enum
  * @{
  */
-/***************************************************************************** 
-* uart 
+/*****************************************************************************
+* uart
 *****************************************************************************/
 /** @brief UART port index
  * We have total 2 UART ports. And UART0 and UART1 support hardware flow control.
@@ -95,15 +95,15 @@ typedef enum {
   * @}
   */
 
-/** 
- * @} 
+/**
+ * @}
  * @}
  */
 #endif
 
 
-#ifdef HAL_I2C_MASTER_MODULE_ENABLED 
-/** 
+#ifdef HAL_I2C_MASTER_MODULE_ENABLED
+/**
  * @addtogroup HAL
  * @{
  * @addtogroup I2C_MASTER
@@ -111,41 +111,29 @@ typedef enum {
  * @defgroup hal_i2c_master_define Define
  * @{
   */
-  
+
 /** @brief  The maximum polling mode transaction size.
   */
 #define HAL_I2C_MAXIMUM_POLLING_TRANSACTION_SIZE  8
 
 /** @brief  The maximum DMA mode transaction size.
   */
-#define HAL_I2C_MAXIMUM_DMA_TRANSACTION_SIZE   255
+#define HAL_I2C_MAXIMUM_DMA_TRANSACTION_SIZE   65535
 
-/** @brief  The maximum queue mode transaction size.
-  */
-#define HAL_I2C_MAXIMUM_QUEUE_MODE_TRANSACTION_SIZE   2040
 
 /**
   * @}
   */
-  
+
 /** @addtogroup hal_i2c_master_enum Enum
   * @{
   */
 
-/***************************************************************************** 
-* i2c master 
+/*****************************************************************************
+* i2c master
 *****************************************************************************/
-/** @brief This enum define the i2c port. 
- *  We have total 2 I2C masters. Two of them support polling mode, DMA mode,
- *  queue mode, while the other one only support polling mode. About polling mode,
- *  DMA mode, queue mode, please refer to @ref HAL_I2C_Features_Chapter. The details
- *  as below:
- *  - I2C masters supported feature table \n
- *    V : means support;  X : means not support.
- * |I2C Master   | Polling mode | DMA mode | Queue mode |
- * |-------------|--------------|----------|------------|
- * |I2C0         |      V       |    V     |     V      |
- * |I2C1         |      V       |    V     |     V      |
+/** @brief This enum define the i2c port.
+ *  We have total 2 I2C masters. Both of them support polling mode and DMA mode.
  *
  *
 */
@@ -159,15 +147,15 @@ typedef enum {
   * @}
   */
 
-/** 
- * @} 
+/**
+ * @}
  * @}
  */
 #endif
 
 
-#ifdef HAL_GPIO_MODULE_ENABLED 
- /** 
+#ifdef HAL_GPIO_MODULE_ENABLED
+ /**
  * @addtogroup HAL
  * @{
  * @addtogroup GPIO
@@ -177,10 +165,10 @@ typedef enum {
  * @{
  */
 
-/***************************************************************************** 
+/*****************************************************************************
 * gpio
 *****************************************************************************/
-/** @brief This enum define the gpio port. 
+/** @brief This enum define the gpio port.
  *
 */
 
@@ -221,15 +209,15 @@ typedef enum {
 /**
   * @}
   */
-  
-/** 
- * @} 
+
+/**
+ * @}
  * @}
  */
 #endif
 
-#ifdef HAL_ADC_MODULE_ENABLED 
- /** 
+#ifdef HAL_ADC_MODULE_ENABLED
+ /**
  * @addtogroup HAL
  * @{
  * @addtogroup ADC
@@ -239,7 +227,7 @@ typedef enum {
  * @{
  */
 
-/***************************************************************************** 
+/*****************************************************************************
 * adc
 *****************************************************************************/
 /** @brief adc channel */
@@ -254,31 +242,31 @@ typedef enum {
 /**
   * @}
   */
-  
 
-/** 
- * @} 
+
+/**
+ * @}
  * @}
  */
 #endif
 
 
 
-#ifdef HAL_I2S_MODULE_ENABLED 
- /** 
+#ifdef HAL_I2S_MODULE_ENABLED
+ /**
  * @addtogroup HAL
  * @{
  * @addtogroup I2S
  * @{
  *
  * @addtogroup hal_i2s_enum Enum
- * @{  
+ * @{
  */
 
-/***************************************************************************** 
+/*****************************************************************************
 * i2s
 *****************************************************************************/
-/** @brief This enum defines initial type of I2S. 
+/** @brief This enum defines initial type of I2S.
  */
 
 typedef enum {
@@ -304,20 +292,19 @@ typedef enum {
     HAL_I2S_SAMPLE_RATE_48K       = 5,  /**<  48000Hz */
 } hal_i2s_sample_rate_t;
 
-
 /**
   * @}
   */
-  
 
-/** 
- * @} 
+
+/**
+ * @}
  * @}
  */
 #endif
 
 
-#ifdef HAL_SPI_MASTER_MODULE_ENABLED 
+#ifdef HAL_SPI_MASTER_MODULE_ENABLED
 /**
  * @addtogroup HAL
  * @{
@@ -326,21 +313,21 @@ typedef enum {
  * @defgroup hal_spi_master_define Define
  * @{
  */
- 
+
 /** @brief  The maximum polling mode transaction size.
  */
- #define HAL_SPI_MAXIMUM_POLLING_TRANSACTION_SIZE  32
- 
+ #define HAL_SPI_MAXIMUM_POLLING_TRANSACTION_SIZE  16
+
 /**
  * @}
  */
- 
-/** 
+
+/**
  * @addtogroup hal_spi_master_enum Enum
  * @{
  */
 
-/***************************************************************************** 
+/*****************************************************************************
 * spi master
 *****************************************************************************/
 /** @brief This enum defines the SPI master port.
@@ -357,14 +344,14 @@ typedef enum {
     HAL_SPI_MASTER_SLAVE_0 = 0,                       /**< spi slave device connect to spi master cs0 pin */
     HAL_SPI_MASTER_SLAVE_1 = 1,                       /**< spi slave device connect to spi master cs1 pin */
     HAL_SPI_MASTER_SLAVE_MAX                          /**< spi master max cs pin number(invalid) */
-} hal_spi_master_slave_port_t; 
+} hal_spi_master_slave_port_t;
 
 /**
  * @}
  */
 
-/** 
- * @} 
+/**
+ * @}
  * @}
  */
 #endif
@@ -374,7 +361,7 @@ typedef enum {
 
 
 #ifdef HAL_EINT_MODULE_ENABLED
-/** 
+/**
  * @addtogroup HAL
  * @{
  * @addtogroup EINT
@@ -383,7 +370,7 @@ typedef enum {
  * @{
  */
 
-/***************************************************************************** 
+/*****************************************************************************
 * eint
 *****************************************************************************/
 /** @brief eint pin number */
@@ -405,16 +392,16 @@ typedef enum {
 /**
   * @}
   */
-  
 
-/** 
- * @} 
+
+/**
+ * @}
  * @}
  */
 #endif
 
 #ifdef HAL_GPT_MODULE_ENABLED
-/** 
+/**
  * @addtogroup HAL
  * @{
  * @addtogroup GPT
@@ -423,7 +410,7 @@ typedef enum {
  * @{
  */
 
-/***************************************************************************** 
+/*****************************************************************************
 * gpt
 *****************************************************************************/
 /** @brief GPT port */
@@ -442,17 +429,17 @@ typedef enum {
 /**
   * @}
   */
-  
 
-/** 
- * @} 
+
+/**
+ * @}
  * @}
  */
 #endif
-     
+
 
 #ifdef HAL_GDMA_MODULE_ENABLED
-/** 
+/**
  * @addtogroup HAL
  * @{
  * @addtogroup GDMA
@@ -460,11 +447,11 @@ typedef enum {
  * @addtogroup hal_gdma_enum Enum
  * @{
  */
-/***************************************************************************** 
+/*****************************************************************************
 * gdma
 *****************************************************************************/
-/** @brief gdma channel */ 
-typedef enum{    
+/** @brief gdma channel */
+typedef enum{
     HAL_GDMA_CHANNEL_0 = 0,                        /**< gdma channel 0 */
     HAL_GDMA_CHANNEL_1 = 1,                        /**< gdma channel 1 */
     HAL_GDMA_CHANNEL_MAX                           /**< gdma max channel (invalid) */
@@ -473,16 +460,16 @@ typedef enum{
 /**
   * @}
   */
-  
 
-/** 
- * @} 
+
+/**
+ * @}
  * @}
  */
 #endif
 
 #ifdef HAL_PWM_MODULE_ENABLED
-/** 
+/**
  * @addtogroup HAL
  * @{
  * @addtogroup PWM
@@ -490,7 +477,7 @@ typedef enum{
  * @addtogroup hal_pwm_enum Enum
  * @{
  */
-/***************************************************************************** 
+/*****************************************************************************
 * pwm
 *****************************************************************************/
 /** @brief pwm channel */
@@ -540,10 +527,10 @@ typedef enum {
 /**
   * @}
   */
-  
 
-/** 
- * @} 
+
+/**
+ * @}
  * @}
  */
 #endif
@@ -551,7 +538,7 @@ typedef enum {
 
 
 #ifdef HAL_GPC_MODULE_ENABLED
-/** 
+/**
  * @addtogroup HAL
  * @{
  * @addtogroup GPC
@@ -561,18 +548,18 @@ typedef enum {
  */
 /** @brief gpc port */
 typedef enum {
-    HAL_GPC_0 = 0,                          /**< gpc port0 */       
+    HAL_GPC_0 = 0,                          /**< gpc port0 */
     HAL_GPC_MAX_PORT                        /**< gpc max port */
-}hal_gpc_port_t;  
+}hal_gpc_port_t;
 
 
 /**
   * @}
   */
-  
 
-/** 
- * @} 
+
+/**
+ * @}
  * @}
  */
 #endif
@@ -583,5 +570,5 @@ typedef enum {
 }
 #endif
 
-#endif /* __HAL_PLATFORM_H__ */ 
+#endif /* __HAL_PLATFORM_H__ */
 

@@ -41,50 +41,56 @@
  * @{
  * @addtogroup IRRX
  * @{
- * This section introduces all details about the IRRX APIs including terms and acronyms,
- * supported features, software architecture, how to use this driver, IRRX function groups ,all enum, structures and functions.
+ * This section introduces the IRRX APIs including terms and acronyms,
+ * supported features, software architecture, details on how to use this driver, IRRX function groups, enums, structures and functions.
  *
  * @section HAL_IRRX_Terms_Chapter Terms and acronyms
  *
  * |Terms                   |Details                                                                 |
  * |------------------------------|------------------------------------------------------------------------|
- * |\b IRRX                       | Infrared Receiver. A receive element use infrared radiation. |
+ * |\b IRRX                       | Infrared Receiver that detects infrared radiation. For more information, please refer to <a href="https://en.wikipedia.org/wiki/Infrared_Data_Association"> introduction to IrDA in Wikipedia </a>. |
  *
  * @section HAL_IRRX_Features_Chapter Supported features
  *
- * - \b Support \b rc5 \b and \b pwd \b mode. \n
- *   MT7687 support two ways to decode by hardware:
- *  - \b rc5 \b mode: The Philips RC5 IR transmission protocol uses Manchester encoding of the message bits.
- *                    In this mode, you can receive and decode rc5 code directly.
- *  - \b pwd \b mode: PWD is pulse-width-detection in short.In this mode, you can receive any kind of code
- *                    transmits by Infrared Radiation. The hardware will count the length of every wave. You can
- *                    know the cammand sent by calculate the length of wave.
+ * - \b Support \b RC5 \b and \b PWD \b modes. \n
+ *   MT7687 supports two hardware decoding methods:
+ *  - \b RC5 \b mode: 
+ *  The Philips RC5 IR transmission protocol uses Manchester encoding of the message bits.
+ *  In this mode, the RC5 code can be received and decoded directly.
+ *  - \b PWD \b mode: 
+ *  PWD is pulse-width-detection in short. In this mode, the hardware detects the wavelengths, any type of code 
+ *  transmitted by infrared radiation can be received.The received content could be determined by using the wavelength.
  *
  * @section HAL_IRRX_Driver_Usage_Chapter How to use this driver
  *
- * - Use IRRX in a rc5 mode. \n
- *  - step1: call #hal_pinmux_set_function to set GPIO34 to function 7.
- *  - step2: call #hal_irrx_receive_rc5_start to start the hardware.
- *  - step3: call #hal_irrx_receive_rc5 to receive code.
- *  - step4: if you want to restart rc5 mode, call #hal_irrx_receive_rc5_start once again.
+ * - Use IRRX in the RC5 mode. \n
+ *  - Step1: Set GPIO34 to function 7 to enable the IRRX mode.
+ *  - Step2: Call hal_irrx_init() to initialize the IRRX.
+ *  - Step3: Call hal_irrx_receive_rc5_start() to start the hardware.
+ *  - Step4: Call hal_irrx_receive_rc5() to receive the RC5 code.
+ *  - Step5: Call hal_irrx_receive_rc5_start() once again to restart the RC5 mode.
+ *  - Step6: Call hal_irrx_deinit() to deinitialize the IRRX.
  *  - sample code:
  *    @code
- *       hal_pinmux_set_function(HAL_GPIO_34, 7);//Set GPIO34 to IRRX mode.
- *       hal_irrx_receive_rc5_start(HAL_IRRX_RC5_RECEIVE_FORMAT_BIT_REVERSE, //hardware will decode received data by bit
- *                                  receive_code_rc5, //callback function
- *                                  NULL);
- *       hal_irrx_receive_rc5(&code_rc5); //receive and save code
- *
+ *       hal_pinmux_set_function(HAL_GPIO_34, 7); //Sets the GPIO34 to IRRX mode.
+ *       hal_irrx_init();
+ *       hal_irrx_receive_rc5_start(HAL_IRRX_RC5_RECEIVE_FORMAT_BIT_REVERSE,
+ *                                  receive_code_rc5, NULL);    //A callback function for the hardware will be triggered when the received code is decoded. 
+ *       hal_irrx_receive_rc5(&code_rc5); //Receives and saves the code
+ *       hal_irrx_deinit();
  *    @endcode
- * - Use IRRX in a pwd mode. \n
- *  - step1: set pwd parameters: inverse and terminate_threshold.
- *  - step2: call #hal_irrx_receive_pwd_start to start the hardware.
- *  - step3: call #hal_irrx_receive_pwd to receive code.
- *  - step4: if you want to restart rc5 mode, call #hal_irrx_receive_pwd_start once again.
+ * - Use IRRX in the PWD mode. \n
+ *  - Step1: Call hal_irrx_init() to initialize the IRRX.
+ *  - Step2: Set the PWD parameters: inverse and terminate_threshold.
+ *  - Step3: Call hal_irrx_receive_pwd_start() to start the hardware.
+ *  - Step4: Call hal_irrx_receive_pwd() to receive the PWD code.
+ *  - Step5: Call hal_irrx_receive_pwd_start() once again to restart the PWD mode.
+ *  - Step6: Call hal_irrx_deinit() to deinitialize the IRRX.
  *  - sample code:
  *    @code
+ *       hal_irrx_init();
  *       uint32_t us = 0;
- *       hal_irrx_pwd_config_t format = {0};    //pwd parameter
+ *       hal_irrx_pwd_config_t format = {0};    //Initializes the PWD parameter.
  *       format.inverse = 1;
  *       format.terminate_threshold = 10200;
  *       if (HAL_IRRX_STATUS_OK != hal_irrx_receive_pwd_start(&format,
@@ -97,9 +103,9 @@
  *                                                      sizeof(data))) {
  *          dbg_error("hal_irrx_receive_pwd fail!");
  *       }
- *
+ *     hal_irrx_deinit();
  *    @endcode
- * - Use IRRX driver to trigger IRRX rc5/pwd manually. \n
+ * - Use IRRX driver to trigger IRRX RC5/PWD manually. \n
  *
  *
  */
@@ -117,24 +123,26 @@ extern "C" {
   */
 
 
-/** @brief RC5 and Pulse Width Detect mode are supported. */
-typedef enum{
-    HAL_IRRX_STATUS_INVALID_PARAM = -2,
-    HAL_IRRX_STATUS_NOT_SUPPORTED = -1,
-    HAL_IRRX_STATUS_OK = 0
+/** @brief RC5 and PWD modes are supported. */
+typedef enum
+{
+ HAL_IRRX_STATUS_INVALID_PARAM = -2,
+ HAL_IRRX_STATUS_NOT_SUPPORTED = -1,
+ HAL_IRRX_STATUS_OK = 0,
 } hal_irrx_status_t;
 
 
-/** @brief IRRX transaction error. */
-typedef enum{
-    HAL_IRRX_EVENT_TRANSACTION_ERROR = -1,
-    HAL_IRRX_EVENT_TRANSACTION_SUCCESS = 0 
+/** @brief IRRX transaction error */
+typedef enum {
+    HAL_IRRX_EVENT_TRANSACTION_ERROR = -1,       /**< IRRX transaction error */
+    HAL_IRRX_EVENT_TRANSACTION_SUCCESS = 0,      /**< IRRX transaction success */
 } hal_irrx_event_t;
+
 
 /** @brief IRRX  running status */
 typedef enum {
-    HAL_IRRX_IDLE = 0,
-    HAL_IRRX_BUSY = 1
+    HAL_IRRX_IDLE = 0,                         /**< IRRX idle */
+    HAL_IRRX_BUSY = 1,                         /**< IRRX busy */
 } hal_irrx_running_status_t;
 
 
@@ -147,11 +155,11 @@ typedef enum {
    */
 
 /** @brief  This defines the callback function prototype.
- *          Register a callback function when in an interrupt mode , this function will be called in IRRX interrupt.
- *          service routine after a transaction is complete
- *  @param [in] event is the transaction event for the current transaction, application can get the transaction result from this parameter.
- *              For more details about the event type, please refer to #hal_irrx_event_t
- *  @param [in] user_data is a parameter provided  by the application .
+ *          Register a callback function when in an interrupt mode, this function is called in IRRX interrupt
+ *          service routine after a transaction is complete.
+ *  @param [in] event is the transaction event for the current transaction. Application obtains the transaction result from this parameter.
+ *              For more details about the event type, please refer to #hal_irrx_event_t.
+ *  @param [in] user_data is a parameter provided  by the application.
  */
 
 typedef void (*hal_irrx_callback_t)(hal_irrx_event_t event, void  *user_data);
@@ -164,7 +172,7 @@ typedef void (*hal_irrx_callback_t)(hal_irrx_event_t event, void  *user_data);
   * @{
   */
 
-/**  @RC5 code.bits specifies the valid bits in code[2]. */
+/**  @RC5 code. The structure member bits specifies the valid bits in code[2]. */
 typedef struct hal_irrx_rc5_code_s
 {
     uint8_t     bits;
@@ -191,11 +199,11 @@ typedef struct hal_irrx_pwd_config_s
   * @{
  */
 
-/** @When applied to RC5 receive format, this flag causes the IR pulse inversed  before decoded. */
+/** @When applied to RC5 receive format, this flag causes the IR pulse inversed  before being decoded. */
 #define HAL_IRRX_RC5_RECEIVE_FORMAT_SIGNAL_INVERSE      (0x1)
 
 
-/** @When applied to RC5 receive format, this flag causes order reverse. The decoded IR pulse is bit-reversed.*/
+/** @When applied to RC5 receive format, this flag causes a bit order reverse. The decoded IR pulse is bit-reversed.*/
 #define HAL_IRRX_RC5_RECEIVE_FORMAT_BIT_REVERSE         (0x10)
 
 /**
@@ -203,26 +211,26 @@ typedef struct hal_irrx_pwd_config_s
   */
 
 /**
- * @brief    This function initializes the IRRX hardware clock
- * @return  To indicate whether this function call is successful or not.
- *               #HAL_IRRX_STATUS_OK if the receive started successfully.
-                #HAL_IRRX_STATUS_INVALID_PARAM if callback is not specified.
+ * @brief    This function initializes the IRRX hardware clock.
+ * @return   Indicates whether this function call is successful or not.
+ *                If the return value is #HAL_IRRX_STATUS_OK, the operation completed successfully.
+ *                If the return value is #HAL_IRRX_STATUS_INVALID_PARAM, it means a wrong parameter is given. The parameter needs to be verified.
  * @par       Example
- * Sample code please refer to @ref Driver_Usage_Chapter
- * @sa  hal_pwm_deinit()
+ * Sample code, please refer to @ref HAL_IRRX_Driver_Usage_Chapter.
+ * @sa  hal_irrx_deinit()
  */
 
 hal_irrx_status_t hal_irrx_init(void);
 
 
 /**
- * @brief    This function de-initializes the IRRX hardware clock
- * @return  To indicate whether this function call is successful or not.
- *               #HAL_IRRX_STATUS_OK if the receive started successfully.
-                 #HAL_IRRX_STATUS_INVALID_PARAM if callback is not specified.
+ * @brief    This function deinitializes the IRRX hardware clock.
+ * @return  Indicates whether this function call is successful or not.
+ *                If the return value is #HAL_IRRX_STATUS_OK, the operation completed successfully.
+ *                If the return value is #HAL_IRRX_STATUS_INVALID_PARAM, it means a wrong parameter is given. The parameter needs to be verified.
  * @par       Example
- * Sample code please refer to @ref Driver_Usage_Chapter
- * @sa  hal_pwm_deinit()
+ * Sample code, please refer to @ref HAL_IRRX_Driver_Usage_Chapter.
+ * @sa  hal_irrx_init()
  */
 
 hal_irrx_status_t hal_irrx_deinit(void);
@@ -230,16 +238,16 @@ hal_irrx_status_t hal_irrx_deinit(void);
 
 
 /**
- * @brief     IR RC5 code receive start function.
- * @param[in] format  the combination of #HAL_IRRX_RC5_RECEIVE_FORMAT_INVERSE
- *                 and #HAL_IRRX_RC5_RECEIVE_FORMAT_REVERSE.
- * @param[in] callback the callback function to be called when the receive has ended.
- * @param[in] parameter the parameter to be bring back to caller when receive has ended.
- * @return   To indicate whether this function call is successful or not.
- *               #HAL_IRRX_STATUS_OK if the receive started successfully.
-                 #HAL_IRRX_STATUS_INVALID_PARAM if callback is not specified.
+ * @brief     This function starts to receive the infrared radiation RC5 code.
+ * @param[in] format  the combination of HAL_IRRX_RC5_RECEIVE_FORMAT_INVERSE,
+ *                 HAL_IRRX_RC5_RECEIVE_FORMAT_REVERSE and HAL_IRRX_RC5_RECEIVE_FORMAT_IGNORE_EMPTY.
+ * @param[in] callback the callback function to be called when the receive operation is complete.
+ * @param[in] parameter the parameter to the caller when return.
+ * @return    Indicates whether this function call is successful or not.
+ *                If the return value is #HAL_IRRX_STATUS_OK, the operation completed successfully.
+ *                If the return value is #HAL_IRRX_STATUS_INVALID_PARAM, it means a wrong parameter is given. The parameter needs to be verified.
  * @par       Example
- * Sample code please refer to @ref HAL_IRRX_Driver_Usage_Chapter 
+ * Sample code, please refer to @ref HAL_IRRX_Driver_Usage_Chapter. 
  * @sa  hal_irrx_receive_rc5()
  */
 
@@ -249,13 +257,13 @@ hal_irrx_status_t hal_irrx_receive_rc5_start(uint8_t             format,
                                              hal_irrx_callback_t callback,
                                              void                *parameter);
 /**
- * @brief     IR RC5 code receive  function.
- * @param[in] ode the callback function to be called when the receive has ended.
- * @return   To indicate whether this function call is successful or not.
- *               HAL_IRRX_STATUS_OK if the receive started successfully.
-                 HAL_IRRX_STATUS_INVALID_PARAM if callback is not specified.
+ * @brief     This function receives the infrared radiation RC5 code.
+ * @param[in] code the infrared radiation RC5 code format definition. For more details about the parameter, please refer to #hal_irrx_rc5_code_t.
+ * @return   Indicates whether this function call is successful or not.
+ *                If the return value is #HAL_IRRX_STATUS_OK, the operation completed successfully.
+ *                If the return value is #HAL_IRRX_STATUS_INVALID_PARAM, it means a wrong parameter is given. The parameter needs to be verified.
  * @par       Example
- * Sample code please refer to @ref HAL_IRRX_Driver_Usage_Chapter 
+ * Sample code, please refer to @ref HAL_IRRX_Driver_Usage_Chapter. 
  * @sa  hal_irrx_receive_rc5_start()
  */
 
@@ -263,14 +271,15 @@ hal_irrx_status_t hal_irrx_receive_rc5(hal_irrx_rc5_code_t *code);
 
 
 /**
- * @brief     IR Pulse-Width-Detection code receive start function.
- * @param[in] config which will be  used when the receive is started.
- * @param[in] callback the callback function to be called when the receive has ended.
- * @return   To indicate whether this function call is successful or not.
- *               #HAL_IRRX_STATUS_OK if the receive started successfully.
- *             #HAL_IRRX_STATUS_INVALID_PARAM if callback is not specified.
+ * @brief     This function starts to receive the infrared radiation PWD code.
+ * @param[in] config it's used when the receive operation starts.
+ * @param[in] callback the callback function to be called when the receive operation starts.
+ * @param[out] precision_us the PWD dectection precise time.
+ * @return    Indicates whether this function call is successful or not.
+ *                If the return value is #HAL_IRRX_STATUS_OK, the operation completed successfully.
+ *                If the return value is #HAL_IRRX_STATUS_INVALID_PARAM, it means a wrong parameter is given. The parameter needs to be verified.
  * @par       Example
- * Sample code please refer to @ref HAL_IRRX_Driver_Usage_Chapter 
+ * Sample code, please refer to @ref HAL_IRRX_Driver_Usage_Chapter. 
  * @sa  hal_irrx_receive_pwd()
  */
 
@@ -281,16 +290,16 @@ hal_irrx_status_t hal_irrx_receive_pwd_start(
 
 
 /**
- * @brief     IR Pulse-Width-Detection code receive function.
+ * @brief     This function  receives the infrared radiation PWD code.
  * @param[in]  received_length the actual received length of code in the buffer.
  * @param[in]   buffer the buffer to be used to stored received code.
  * @param[in]  buffer_length the length of buffer that can be used to store  received code. 
  *                    The maximum is 68 bytes and it is suggested to prepare 68 bytes of space for buffer and specify 68 as buffer_length.
- * @return   To indicate whether this function call is successful or not.
- *               #HAL_IRRX_STATUS_OK if the  receive ended successfully.
-                 #HAL_IRRX_STATUS_INVALID_PARAM ifif code is NULL.
+ * @return    Indicates whether this function call is successful or not.
+ *                If the return value is #HAL_IRRX_STATUS_OK, the operation completed successfully.
+ *                If the return value is #HAL_IRRX_STATUS_INVALID_PARAM, it means a wrong parameter is given. The parameter needs to be verified.
  * @par       Example
- * Sample code please refer to @ref HAL_IRRX_Driver_Usage_Chapter 
+ * Sample code, please refer to @ref HAL_IRRX_Driver_Usage_Chapter. 
  * @sa  hal_irrx_receive_pwd()
  */
 
@@ -300,14 +309,14 @@ hal_irrx_status_t hal_irrx_receive_pwd(uint8_t  *received_length,
 
 
 /**
- * @brief    This function is used to get the current state of the IRRX
+ * @brief    This function gets the current state of the IRRX.
  * @param[out] running_status is the current running status.
- *             #HAL_IRRX_BUSY means the IRRX is in busy status; \n
+ *             #HAL_IRRX_BUSY means the IRRX is in busy status.
  *             #HAL_IRRX_IDLE means the IRRX is in idle status, user can use it to transfer data now.
- * @return   To indicate whether this function call is successful or not.
- *               If the return value is #HAL_IRRX_STATUS_OK, it means success.
+ * @return   Indicates whether this function call is successful or not.
+ *                If the return value is #HAL_IRRX_STATUS_OK, the operation completed successfully.
  * @par       Example
- * Sample code please refer to @ref HAL_IRRX_Driver_Usage_Chapter 
+ * Sample code, please refer to @ref HAL_IRRX_Driver_Usage_Chapter. 
  * @sa   hal_irrx_receive_pwd()
  */
 
@@ -319,11 +328,7 @@ hal_irrx_status_t hal_irrx_get_running_status(hal_irrx_running_status_t *running
     }
 #endif
 
-/**
- * @}
- * @}
-*/
-
+/** @}*/
 #endif /*HAL_IRRX_MODULE_ENABLED*/
 #endif /* __HAL_IRRX_H__ */
 

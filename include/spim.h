@@ -113,29 +113,8 @@ typedef void (*USER_CALLBACK)(void);
  *
  * @note Use gpio_32, gpio_31, gpio_30, gpio_29.
  */
-int32_t spim_init(uint32_t setting, uint32_t clock, USER_CALLBACK callback);
-
-
-/**
- * @brief  SPI master TX/RX data routines.
- *
- * @param  op_addr          [IN] Operation_address. The range should be less than 4 bytes(0x0~0x00FFFFFF).
- * @param  addr_ext         [IN] Address_extension. The fourth bytes of address if required.
- * @param  number_cmd_byte  [IN] The number of command bytes.
- * @param  buf              [IN] The data buffer, the range should be less than 32 bytes. If flag is SPIM_READ, then buffer would be the data read from SPI bus, otherwise (flag is SPI_WRITE) the data in the buffer would be sent out to SPI bus.
- * @param  buf_cnt          [IN] The number of buffer to READ or WRITE.
- * @param  flag             [IN]  SPI_READ, SPI_WRITE or other
- *
- * @return Negative value if there is a failure. Success otherwise.
- *
- * @note if use full duplex mode the buf_cnt must under 16 byte. TX and RX data are use same buffer.
- */
-int32_t spim_transfer(const uint32_t    op_addr,
-                      const uint8_t     addr_ext,
-                      const size_t      n_cmd_byte,
-                      uint8_t           *buf,
-                      const size_t      buf_cnt,
-                      const uint32_t    flag);
+//int32_t spim_init(uint32_t setting, uint32_t clock, USER_CALLBACK callback);
+int32_t spim_init(uint32_t setting, uint32_t clock);
 
 /**
  * @brief  SPI master TX data routines.
@@ -158,42 +137,6 @@ int32_t spim_write(uint8_t *buf, const uint32_t buf_cnt);
  * @return Negative value if there is a failure. Success otherwise.
  */
 int32_t spim_read(const uint32_t cmd, const uint32_t n_cmd_byte, uint8_t *buf, const uint32_t buf_cnt);
-
-
-/**
- * @brief  SPI master TX/RX data routines use dma mode.
- *
- * @param  opcode       [IN] opcode + address The range should be less than 3 bytes.
- * @param  addr_ext     [IN] The fourth bytes of address if required.
- * @param  opcode_len   [IN] The number of command bytes.
- * @param  spi_data     [IN] The data buffer. If flag is SPIM_READ, then buffer would be the data read from SPI bus, otherwise (flag is SPI_WRITE) the data in the buffer would be sent out to SPI bus.
- * @param  data_len     [IN] The number of buffer to READ or WRITE.
- * @param  flag         [IN] SPIM_READ, SPIM_WRITE or other
- *
- * @return Negative value if there is a failure. Success otherwise.
- */
-int32_t spim_dma(uint32_t   opcode,
-                 uint8_t    addr_ext,
-                 int32_t    opcode_len,
-                 uint8_t    *spi_data,
-                 int32_t    data_len,
-                 uint32_t   flag);
-
-
-/**
- * @brief  Let SPIM set to IP default value
- *
- * @return Negative value if there is a failure. Success otherwise.
- */
-int32_t spim_reset(void);
-
-
-/**
- * @brief  Dump SPIM register value
- *
- * @return Negative value if there is a failure. Success otherwise.
- */
-int32_t spim_dump(void);
 
 #ifdef __cplusplus
 }

@@ -177,6 +177,7 @@
  * - \b Using \b GPT \b in \b free \b run \b mode. \n
  *    Call #hal_gpt_get_free_run_count() function to get the first stamp of timer ticks.
  *    Call #hal_gpt_get_free_run_count() function again to get the second stamp of timer ticks.
+ *    When you use HAL_GPT_CLOCK_SOURCE_32K parameter, the unit of tick is 1/32768 second.
  *    The different value between the first and the second stamp is the counting ticks.
  *    In a free run mode, the GPT runs continuously and never stop. It do not provide interrupt feature.
  *    The GPT driver also uses this function implementation such as delay function #hal_gpt_delay_ms().
@@ -185,7 +186,8 @@
  *  - Sample code:
  *    @code
  *       hal_gpt_status_t         ret_status;
- *       uint32_t                 count1, count2, time;
+ *       uint32_t                 count1, count2, duration_count;
+ *       uint32_t                 time;
  *       
  *        //get the first value.
  *       ret_status = hal_gpt_get_free_run_count(HAL_GPT_CLOCK_SOURCE_32K, &count1); 
@@ -193,7 +195,7 @@
  *          //error handler 
  *       }
  *      
- *       hal_gpt_delay_ms(10)                               //delay 10 millisseconds
+ *       hal_gpt_delay_ms(10);                               //delay 10 millisseconds
  *       
  *       //get the second value.
  *       ret_status = hal_gpt_get_free_run_count(HAL_GPT_CLOCK_SOURCE_32K, &count2);    
@@ -201,12 +203,13 @@
  *          //error handler 
  *       }
  *       
- *       if ( count2 >= count1) {
- *          time = (count2 - count1)/32;                    //the time value is 10 millisseconds.
+ *      //caculate count1 and count2 duration count value, the duration unit is 1/32768 second.
+ *      ret_status = hal_gpt_get_duration_count(count1, count2, &duration_count);
+ *       if(HAL_GPT_STATUS_OK != ret_status) {
+ *          //error handler 
  *       }
- *       else {
- *          time = (0xffffffff - (count1 - count2))/32;                  
- *       }
+ *      
+ *       time = (duration_count*1000)/32768;                //the time means milliseconds.
  *    @endcode
  * @} 
  * @}
@@ -221,11 +224,12 @@
  *  - 
  *    If use the enum paramter HAL_GPT_CLOCK_SOURCE_1M in #hal_gpt_get_free_run_count(), 
  *    notice that using HAL_GPT_CLOCK_SOURCE_13K and HAL_GPT_CLOCK_SOURCE_1M means use different free run timer.
+ *    when you use HAL_GPT_CLOCK_SOURCE_1M, the count of tick unit is 1 micosecond.
  *    For more details about HAL_GPT_CLOCK_SOURCE_1M and HAL_GPT_CLOCK_SOURCE_13K, please refer to @ref hal_gpt_enum about hal_gpt_clock_source_t.
  *  - Sample code:
  *    @code
  *       hal_gpt_status_t         ret_status;
- *       uint32_t                 count1, count2, time;
+ *       uint32_t                 count1, count2, duration_count;
  *
  *       //get the first value.
  *       ret_status = hal_gpt_get_free_run_count(HAL_GPT_CLOCK_SOURCE_1M, &count1);            
@@ -233,19 +237,18 @@
  *          //error handler 
  *       }
  *      
- *       hal_gpt_delay_us(10)                       //delay 10 microseconds.
+ *       hal_gpt_delay_us(10);                       //delay 10 microseconds.
  *      
  *       //get the second value.
- *       ret_status = hal_gpt_get_free_run_count(HAL_GPT_CLOCK_SOURCE_1M, &count1);           
+ *       ret_status = hal_gpt_get_free_run_count(HAL_GPT_CLOCK_SOURCE_1M, &count2);           
  *       if(HAL_GPT_STATUS_OK != ret_status) {
  *          //error handler 
  *       }
  *       
- *       if ( count2 >= count1) {
- *          time = (count2 - count1);               //the time value is 10 microseconds.
- *       }
- *       else {
- *          time = (0xffffffff - (count1 - count2));                    
+ *      //caculate count1 and count2 duration count value, the duration unit is 1 microsecond.
+ *      ret_status = hal_gpt_get_duration_count(count1, count2, &duration_count);
+ *       if(HAL_GPT_STATUS_OK != ret_status) {
+ *          //error handler 
  *       }
  *    @endcode  
  * @} 
@@ -335,7 +338,6 @@ typedef enum {
     HAL_GPT_STOPPED = 0,                            /**< The GPT is stopped */
     HAL_GPT_RUNNING = 1                             /**< The GPT is running */
 } hal_gpt_running_status_t;
-
 
 
 /**
@@ -446,6 +448,17 @@ hal_gpt_status_t hal_gpt_delay_us(uint32_t us);
  *            #HAL_GPT_STATUS_ERROR_PORT, if the gpt_port value is wrong.      
  */
 hal_gpt_status_t hal_gpt_stop_timer(hal_gpt_port_t gpt_port);
+
+/**
+ * @brief      Caculate the duration count value.
+ * @param[in]  start_count is the start count value. 
+ * @param[in]  end_count is the start count value. 
+ * @param[out] duration_count is the user's parameter pointer to get duration count.
+ * @return     #HAL_GPT_STATUS_OK, if operation is successful.\n
+ *             #HAL_GPT_STATUS_INVALID_PARAMETER, duration_count is null.
+ */
+hal_gpt_status_t hal_gpt_get_duration_count(uint32_t start_count, uint32_t end_count, uint32_t *duration_count);
+
 
 #ifdef __cplusplus
 }

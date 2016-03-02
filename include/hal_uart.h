@@ -318,7 +318,6 @@ typedef enum {
 typedef enum {
     HAL_UART_STOP_BIT_1 = 0,              /**< Defines UART stop bit as 1 bit per frame */
     HAL_UART_STOP_BIT_2 = 1,              /**< Defines UART stop bit as 2 bit per frame */
-    HAL_UART_STOP_BIT_1_5 = 2             /**< Defines UART stop bit as 1.5 bit per frame */
 } hal_uart_stop_bit_t;
 
 

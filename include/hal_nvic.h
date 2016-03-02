@@ -58,9 +58,27 @@
  *    
  * - Use NVIC. \n
  *
- *  - Step1: Call hal_nvic_init function() to initialize the NVIC IRQ priority according to the exception number. By default, the lower the exception number the higher is the priority.
- *  - Step2: Call hal_nvic_register_isr_handler() function to register an ISR handler before using NVIC IRQ. The ISR handler runs when the NVIC IRQ is triggered.
+ *  - Step1: Call hal_nvic_init() function to initialize the NVIC IRQ priority according to the exception number. By default, the lower the exception number the higher is the priority.
+ *  - Step2: Call hal_nvic_register_isr_handler() function to register an ISR handler before using NVIC IRQ. 
  *  - Step3: Use CMSIS interface to adjust IRQ priority if needed.
+ *  - Step4: Use NVIC_EnableIRQ() to enable the IRQ.
+ *  - Sample code:
+ *    @code
+ *       ret = hal_nvic_init();    //should be done once and only once at init stage 
+ *       if (HAL_NVIC_STATUS_OK != ret) {
+ *               //error handle;
+ *       }
+ *       ret = hal_nvic_register_isr_handler(irq_number, isr_handler);   //register IRQ handler.
+ *       if (HAL_NVIC_STATUS_OK !=  ret) {
+ *               //error handle;
+ *       }
+ *       NVIC_EnableIRQ(irq_number);
+ *
+ *      //Change IRQ priority optional 
+ *       NVIC_DisableIRQ(irq_number);   //disable IRQ irq_number
+ *       NVIC_SetPriority(irq_number);  // change the priority of IRQ irq_number if needed
+ *       NVIC_EnableIRQ(irq_number);    //enable IRQ irq_number  
+ *    @endcode
  *
  */
 
@@ -96,7 +114,7 @@ typedef enum {
  *          User should register an ISR for evrey NVIC IRQ used;
  *          This function is called in the NVIC ISR after the NVIC IRQ is triggered.
  *          More details about the callback, please refer to hal_nvic_register_isr_handler().
- *  @param [out] irq_number is given by driver to notify the current NVIC IRQ.
+ *  @param [in] irq_number is given by driver to notify the current NVIC IRQ.
  */
 typedef void (*hal_nvic_isr_t)(hal_nvic_irq_t irq_number);
 /**

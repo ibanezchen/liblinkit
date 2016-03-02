@@ -28,11 +28,15 @@
  * OR REFUND ANY SOFTWARE LICENSE FEES OR SERVICE CHARGE PAID BY RECEIVER TO
  * MEDIATEK FOR SUCH MEDIATEK SOFTWARE.
  */
- 
+
 #ifndef __HAL_CACHE_INTERNAL_H__
 #define __HAL_CACHE_INTERNAL_H__
 
 #ifdef HAL_CACHE_MODULE_ENABLED
+
+#include "nvic.h"
+#include "hal_cache_hw.h"
+
 
 
 #ifdef __cplusplus
@@ -41,36 +45,36 @@ extern "C" {
 
 typedef union {
     struct {
-        uint32_t MCEN: 1;                       /**< bit 0 */
-        uint32_t MPEN: 1;
-        uint32_t CNTEN0: 1;
-        uint32_t CNTEN1: 1;
-        uint32_t MPDEFEN: 1;
-        uint32_t _reserved0: 2;
-        uint32_t MDRF: 1;
-        uint32_t CACHESIZE: 2;
-        uint32_t _reserved1: 22;
+        uint32_t MCEN: 1;                       /**< CACHE enable */
+        uint32_t MPEN: 1;                       /**< MPU enable */
+        uint32_t CNTEN0: 1;                     /**< Hit counter0 enable */
+        uint32_t CNTEN1: 1;                     /**< Hit counter1 enable */
+        uint32_t MPDEFEN: 1;                    /**< MPU default protection */
+        uint32_t _reserved0: 2;                 /**< Reserved */
+        uint32_t MDRF: 1;                       /**< Early restart */
+        uint32_t CACHESIZE: 2;                  /**< CACHE size */
+        uint32_t _reserved1: 22;                /**< Reserved */
     } b;
     uint32_t w;
 } CACHE_CON_Type;
 
-typedef uint32_t CACHE_REGION_EN_Type;
+typedef uint32_t CACHE_REGION_EN_Type;          /**< Region Enable Type */
 
 typedef union {
     struct {
         uint32_t _reserved0: 5;                 /**< bit 0 */
-        uint32_t ATTR: 3;
-        uint32_t C: 1;
-        uint32_t _reserved1: 3;
-        uint32_t BASEADDR: 20;
+        uint32_t ATTR: 3;                       /**< Attribute */
+        uint32_t C: 1;                          /**< Cacheable bit */
+        uint32_t _reserved1: 3;                 /**< Reserved */
+        uint32_t BASEADDR: 20;                  /**< Base address of CACHE region */
     } b;
     uint32_t w;
 } CACHE_ENTRY_N_Type;
 
 typedef union {
     struct {
-        uint32_t _reserved0: 12;
-        uint32_t BASEADDR: 20;
+        uint32_t _reserved0: 12;                /**< Reserved */
+        uint32_t BASEADDR: 20;                  /**< End address of CACHE region */
     } b;
     uint32_t w;
 } CACHE_END_ENTRY_N_Type;
@@ -86,16 +90,27 @@ extern CACHE_REGION_EN_Type g_cache_region_en;
 extern CACHE_ENTRY_Type g_cache_entry[HAL_CACHE_REGION_MAX];
 
 #define MTK_CACHE_LINE_SIZE 		(32)        /**< CACHE line size is 8-word(32-byte) */
+#define MTK_CACHE_REGION_SIZE_UNIT  (0x1000)    /**< CACHE region size must be 4KB aligned */
 
 typedef enum {
-    CACHE_INVALIDATE_ALL_LINES = 1,
-    CACHE_INVALIDATE_ONE_LINE_BY_ADDRESS = 2,
-    CACHE_INVALIDATE_ONE_LINE_BY_SET_WAY = 4,
-    CACHE_FLUSH_ALL_LINES = 9,
-    CACHE_FLUSH_ONE_LINE_BY_ADDRESS = 10,
-    CACHE_FLUSH_ONE_LINE_BY_SET_WAY = 12
+    CACHE_INVALIDATE_ALL_LINES = 1,             /**< Invalidate all CACHE line */
+    CACHE_INVALIDATE_ONE_LINE_BY_ADDRESS = 2,   /**< Invalidate one line by address */
+    CACHE_INVALIDATE_ONE_LINE_BY_SET_WAY = 4,   /**< Invalidate one line by set and way */
+    CACHE_FLUSH_ALL_LINES = 9,                  /**< Flush all CACHE lines */
+    CACHE_FLUSH_ONE_LINE_BY_ADDRESS = 10,       /**< Flush one line by address */
+    CACHE_FLUSH_ONE_LINE_BY_SET_WAY = 12        /**< Flush one line by set and way */
 } cache_line_command_t;
 
+#if 0
+/* Save CACHE status before entering deepsleep */
+void cache_status_save(void);
+
+/* Restore CACHE status after leaving deepsleep */
+void cache_status_restore(void);
+
+/* Query whether is a cacheable buffer */
+bool cache_is_buffer_cacheable(uint32_t address, uint32_t length);
+#endif
 
 #ifdef __cplusplus
 }

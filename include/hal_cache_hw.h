@@ -93,7 +93,7 @@ typedef struct {
 #define CACHE_OP_OP_MASK 						(15<<CACHE_OP_OP_OFFSET)
 
 #define CACHE_OP_TADDR_OFFSET 					(5)
-#define CACHE_OP_TADDR_MASK 					(0xFFFFFFE0UL<<CACHE_OP_TADDR_OFFSET)
+#define CACHE_OP_TADDR_MASK 					(0x7FFFFFFUL<<CACHE_OP_TADDR_OFFSET)
 
 /* CACHE_HCNT0L register definitions
  */

@@ -40,36 +40,35 @@
  * @{
  * @addtogroup TRNG
  * @{
- * This section introduces  the TRNG APIs including terms and acronym,
- * supported features, software architecture, how to use this driver, TRNG function groups, all enum, structures and functions.
+ * This section introduces the TRNG APIs including terms and acronyms,
+ * supported features, software architecture, details on how to use this driver, TRNG function groups, enums, structures and functions.
  *
  * @section Terms_Chapter Terms and acronyms
  *
  * |Terms                   |Details                                                                 |
  * |------------------------------|------------------------------------------------------------------------|
- * |\b TRNG                |True Randam Number Generater. TRNG is a HW generater which will generate random data for applications . |
+ * |\b TRNG                |True Randam Number Generator. TRNG is a hardware generator to generate random data for applications. |
 
- * @section TRNG_Driver_Usage_Chapter How to use this driver
+ * @section TRNG_Driver_Usage_Chapter  How to use this driver
  *
- * - Trigger TRNG generate random number. \n
- *  - step1: Call hal_trng_init() to initialize  TRNG clock.
- *  - step2: Call hal_trng_get_generated_random_number() to generate random number.
- *  - step3: Call hal_trng_deinit() to  de-initialize  TRNG
-
- *  - sample code:
- *    @code
- *       ret = hal_trng_init(); //initialize the TRNG source clock
+ * - Trigger TRNG to generate a random number. \n
+ *  - Step1: Call hal_trng_init() to initialize the TRNG clock.
+ *  - Step2: Call hal_trng_get_generated_random_number() to generate random number.
+ *  - Step3: Call hal_trng_deinit() to de-initialize the TRNG.
+ *  - Sample code:
+ *  @code
+ *       ret = hal_trng_init();  //Initializes the TRNG source clock.
  *       if(HAL_TRNG_STATUS_OK != ret) {
  *             //error handle
  *       }
- *       ret = hal_trng_get_generated_random_number(&random_number); //get random number .
+ *       ret = hal_trng_get_generated_random_number(&random_number); //Gets the random number.
  *       if(HAL_TRNG_STATUS_OK != ret) {
  *             //error handle
  *       }
  *       
- *    hal_trng_deinit();   // de-initialize the TRNG.
+ *    hal_trng_deinit();   // Deinitializes the TRNG.
  *
- *    @endcode
+ *  @endcode
  */
 
 
@@ -86,9 +85,9 @@ extern "C" {
 
 /** @brief This enum defines the API return type.  */
 typedef enum {
-    HAL_TRNG_STATUS_ERROR                = -2,         /**< This value means error happened during the function call. */
-    HAL_TRNG_STATUS_INVALID_PARAMETER    = -1,         /**<  This value means a wrong parameter is given. */
-    HAL_TRNG_STATUS_OK                   =  0          /**<  This value means no error happen during the function call. */
+    HAL_TRNG_STATUS_ERROR                = -2,         /**< An error occurred during the function call. */
+    HAL_TRNG_STATUS_INVALID_PARAMETER    = -1,         /**< A wrong parameter is given. */
+    HAL_TRNG_STATUS_OK                   =  0          /**< No error occurred during the function call. */
 } hal_trng_status_t;
 
 
@@ -99,11 +98,11 @@ typedef enum {
 
 
 /**
- * @brief     This function initializes the TRNG hardware clock .
- * @return   To indicate whether this function call is successful or not.
- *               If the return value is #HAL_TRNG_STATUS_OK, it means success.
+ * @brief     This function initializes the TRNG hardware clock.
+ * @return   Indicates whether this function call is successful or not.
+ *               If the return value is #HAL_TRNG_STATUS_OK, the operation completed successfully.
  * @par       Example
- * Sample code please refer to @ref TRNG_Driver_Usage_Chapter
+ * Sample code, please refer to @ref TRNG_Driver_Usage_Chapter.
  * @sa  hal_trng_deinit()
  */
 
@@ -112,11 +111,11 @@ hal_trng_status_t hal_trng_init(void);
 
 
 /**
- * @brief     This function de-initializes the TRNG hardware clock .
- * @return   To indicate whether this function call is successful or not.
- *               If the return value is #HAL_TRNG_STATUS_OK, it means success.
+ * @brief     This function de-initializes the TRNG hardware clock.
+ * @return   Indicates whether this function call is successful or not.
+ *               If the return value is #HAL_TRNG_STATUS_OK, the operation completed successfully.
  * @par       Example
- * Sample code please refer to @ref TRNG_Driver_Usage_Chapter
+ * Sample code, please refer to @ref TRNG_Driver_Usage_Chapter.
  * @sa  hal_trng_init()
  */
 
@@ -125,12 +124,12 @@ hal_trng_status_t hal_trng_deinit(void);
 
 
 /**
- * @brief     This function is used to get  random number which TRNG generated .
- * @param[out] random_number is the TRNG hardware generated.
- * @return   To indicate whether this function call is successful or not.
- *               If the return value is #HAL_TRNG_STATUS_OK, it means success.
+ * @brief     This function gets the random number generated by the TRNG.
+ * @param[out] random_number is the TRNG hardware generated random number.
+ * @return   Indicates whether this function call is successful or not.
+ *               If the return value is #HAL_TRNG_STATUS_OK, the operation completed successfully.
  * @par       Example
- * Sample code please refer to @ref TRNG_Driver_Usage_Chapter.
+ * Sample code, please refer to @ref TRNG_Driver_Usage_Chapter.
  * @sa  hal_trng_init(),hal_trng_deinit().
  */
 
@@ -150,4 +149,5 @@ hal_trng_status_t hal_trng_get_generated_random_number(uint32_t *random_number);
 
 #endif /*HAL_TRNG_MODULE_ENABLED*/
 #endif /* __HAL_TRNG_H__ */
+
 

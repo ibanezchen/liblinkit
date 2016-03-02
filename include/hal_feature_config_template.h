@@ -42,10 +42,8 @@
 * module ON or OFF feature option,only option in this temple
 *****************************************************************************/
 
-//#define HAL_ACCDET_MODULE_ENABLED
 #define HAL_ADC_MODULE_ENABLED
 #define HAL_AES_MODULE_ENABLED          
-//#define HAL_AUDIO_MODULE_ENABLED     
 #define HAL_CACHE_MODULE_ENABLED    
 #define HAL_DES_MODULE_ENABLED      
 #define HAL_EINT_MODULE_ENABLED        
@@ -58,15 +56,9 @@
 #define HAL_I2S_MODULE_ENABLED  
 #define HAL_IRRX_MODULE_ENABLED       
 #define HAL_IRTX_MODULE_ENABLED
-//#define HAL_ISINK_MODULE_ENABLED       
-//#define HAL_KEYPAD_MODULE_ENABLED      
 #define HAL_MD5_MODULE_ENABLED          
-//#define HAL_MPU_MODULE_ENABLED  
-//#define HAL_NVIC_MODULE_ENABLED   
 #define HAL_PWM_MODULE_ENABLED         
 #define HAL_RTC_MODULE_ENABLED         
-//#define HAL_SD_MODULE_ENABLED           
-//#define HAL_SDIO_MODULE_ENABLED         
 #define HAL_SHA_MODULE_ENABLED         
 #define HAL_SPI_MASTER_MODULE_ENABLED   
 //#define HAL_SPI_SLAVE_MODULE_ENABLED

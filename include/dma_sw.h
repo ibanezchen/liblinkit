@@ -43,6 +43,10 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#include "hal_platform.h"
+#ifdef HAL_GDMA_MODULE_ENABLED
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -459,9 +463,17 @@ int DMA_UnRegister(uint8_t dma_ch);
 
 bool DMA_memcpy(const void *src, const void *dst, unsigned int length);
 
+uint8_t dma_set_channel_idle(uint8_t channel);
+
+uint8_t  dma_set_channel_busy(uint8_t channel);
+
+
+
 #ifdef __cplusplus
 }
 #endif
+
+#endif  //#ifdef HAL_GDMA_MODULE_ENABLED
 
 #endif   /*_DMA_SW_H*/
 

@@ -244,8 +244,8 @@ typedef void (*hal_gpc_callback_t)(void *user_data);
 #ifdef HAL_GPC_FEATURE_ADVANCED_CONFIG
 /** @brief This enum define GPC clock source*/
 typedef enum {
-    HAL_GPC_CLOCK_32KHZ = 0,                        /**< Set the GPC clock source 32khz */
-    HAL_GPC_CLOCK_26MHZ = 1,                        /**< Set the GPC clock source 26Mhz */
+    HAL_GPC_CLOCK_26MHZ = 0,                        /**< Set the GPC clock source 26Mhz */
+    HAL_GPC_CLOCK_32KHZ = 1,                        /**< Set the GPC clock source 32Khz */
 } hal_gpc_clock_t;
 #endif
 

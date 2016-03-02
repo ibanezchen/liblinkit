@@ -96,22 +96,6 @@ uint32_t get_current_gpt4_count(void);
  */
 void delay_ms(uint32_t ms);
 /**
- * @brief System delay time 1ms function
- *
- * @param unit [IN] Delay time 0.1ms, unit is 32k clock unit.
- *
- * @return None
- */
-void delay_100us(uint32_t unit);
-/**
- * System delay usec function
- *
- * @param us  [IN]Delay time 1us, unit is 40Mhz clock unit.
- *
- * @return None
- */
-void delay_us(unsigned int us);
-/**
  * @brief TMR0/1 init function
  *
  * @param timerNum [IN]  TMR0 or TMR1
@@ -121,7 +105,7 @@ void delay_us(unsigned int us);
  *
  * @return None
  */
-void drvTMR_init(uint8_t timerNum, uint32_t countValue, bool  autoRepeat, void (*TMR_Callback)(void));
+void drvTMR_init(uint32_t timerNum, uint32_t countValue, bool  autoRepeat, void (*TMR_Callback)(void));
 /**
  * @brief Timer0/1 and GPT2/4start function
  *
@@ -129,7 +113,7 @@ void drvTMR_init(uint8_t timerNum, uint32_t countValue, bool  autoRepeat, void (
  *
  * @return None
  */
-void TMR_Start(uint8_t timerNum);
+void TMR_Start(uint32_t timerNum);
 /**
  * @brief Timer0/1 and GPT2/4 stop function
  *
@@ -137,7 +121,7 @@ void TMR_Start(uint8_t timerNum);
  *
  * @return None
  */
-void TMR_Stop(uint8_t timerNum);
+void TMR_Stop(uint32_t timerNum);
 /**
  * @brief GPT2 init function
  *
@@ -157,7 +141,7 @@ void drvGPT4Init(void);
  *
  * @return None
  */
-void clear_TMR_INT_status_bit (uint8_t timerNum);
+void clear_TMR_INT_status_bit (uint32_t timerNum);
 
 
 #ifdef __cplusplus
