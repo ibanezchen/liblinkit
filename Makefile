@@ -9,8 +9,6 @@ install:
 	rm -rf $(PREFIX)/include/$(NAME)
 	mkdir -p $(PREFIX)/include/$(NAME)
 	install -Dp include/*.h  $(PREFIX)/include/$(NAME)/
-	cp -r include/lwip  $(PREFIX)/include/$(NAME)/
-	cp -r include/netif  $(PREFIX)/include/$(NAME)/
-	cp -r include/arch  $(PREFIX)/include/$(NAME)/
+	cp -r include/lwip  $(PREFIX)/include/
 	cp -r include/posix  $(PREFIX)/include/$(NAME)/
 

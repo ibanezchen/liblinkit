@@ -26,4 +26,5 @@ for s in $SRC_INCS ; do
 	cp -r $s/* include
 done
 
-
+mv include/arch include/lwip/
+mv include/netif include/lwip/
