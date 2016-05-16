@@ -2,6 +2,8 @@ TARGET :=arm-none-eabi
 PREFIX ?= $(shell pwd)/../prefix/$(TARGET)
 NAME=linkit
 
+all:install
+
 install:
 	mkdir -p $(PREFIX)/lib
 	mkdir -p $(PREFIX)/include
