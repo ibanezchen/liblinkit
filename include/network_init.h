@@ -59,7 +59,7 @@ typedef void (*wifi_ip_ready_callback_t)(const struct netif *netif);
 *
 * @return >=0 the operation completed successfully, <0 the operation failed.
 */
-void network_init(void);
+void network_init(char** mac_addr);
 
 /**
 * @brief This function registers a callback and this callback will be called on the moment a valid IP address is got after wifi connection is done

@@ -28,3 +28,12 @@ done
 
 mv include/arch include/lwip/
 mv include/netif include/lwip/
+
+for l in lib/* ; do
+	arm-none-eabi-objcopy --strip-debug $l $l.nd
+	mv $l.nd $l
+done
+
+git checkout include/hal_feature_config.h
+git checkout include/lwip/lwipopts.h
+
